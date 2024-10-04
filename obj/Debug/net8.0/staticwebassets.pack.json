@@ -1,0 +1,41 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\index.css",
+      "PackagePath": "staticwebassets\\app\\index.css"
+    },
+    {
+      "Id": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\index.html",
+      "PackagePath": "staticwebassets\\app\\index.html"
+    },
+    {
+      "Id": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\index.js",
+      "PackagePath": "staticwebassets\\app\\index.js"
+    },
+    {
+      "Id": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\index.js.map",
+      "PackagePath": "staticwebassets\\app\\index.js.map"
+    },
+    {
+      "Id": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\vite.svg",
+      "PackagePath": "staticwebassets\\app\\vite.svg"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.TodoAppAPI.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.TodoAppAPI.props",
+      "PackagePath": "build\\TodoAppAPI.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.TodoAppAPI.props",
+      "PackagePath": "buildMultiTargeting\\TodoAppAPI.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.TodoAppAPI.props",
+      "PackagePath": "buildTransitive\\TodoAppAPI.props"
+    }
+  ],
+  "ElementsToRemove": []
+}
