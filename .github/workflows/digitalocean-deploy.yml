@@ -22,10 +22,11 @@ jobs:
 
       - name: Build Docker image with secrets
         run: |
-          docker build -t ${{ env.IMAGE_TAG }} \
+          docker buildx build -t ${{ env.IMAGE_TAG }} \
             --build-arg MONGO_CONNECTION_STRING=${{ secrets.MONGO_CONNECTION_STRING }} \
             --build-arg MONGO_DATABASE_NAME=${{ secrets.MONGO_DATABASE_NAME }} \
-            --build-arg MONGO_COLLECTION_NAME=${{ secrets.MONGO_COLLECTION_NAME }} .
+            --build-arg MONGO_COLLECTION_NAME=${{ secrets.MONGO_COLLECTION_NAME }} \
+            .
 
       - name: Save Docker image to a tar file
         run: |
@@ -64,7 +65,7 @@ jobs:
             sudo docker load -i /home/${USERNAME}/image.tar
             sudo docker stop my-container || true
             sudo docker rm my-container || true
-            sudo docker run -d --name my-container -p 8080:8080 \
+            sudo docker run -d --name my-container -p 8081:8080 \
               -e MONGO_CONNECTION_STRING=${{ secrets.MONGO_CONNECTION_STRING }} \
               -e MONGO_DATABASE_NAME=${{ secrets.MONGO_DATABASE_NAME }} \
               -e MONGO_COLLECTION_NAME=${{ secrets.MONGO_COLLECTION_NAME }} \
