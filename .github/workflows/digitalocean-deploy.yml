@@ -2,44 +2,27 @@ name: Build and Push Docker Image to DigitalOcean Droplet
 
 on:
   push:
-    branches:
-      - master
+    branches: [master, main]  # Trigger on both master and main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: actions/checkout@v4  # Upgraded to v4
 
       - name: Set up Docker Image Tag
         run: |
-          echo "IMAGE_TAG=todoapp:$(date +%s)" >> $GITHUB_ENV
-
-      - name: Check Docker daemon status
-        run: |
-          sudo systemctl status docker
-          docker info
-
-      - name: Clear Docker build cache
-        run: docker builder prune -a -f
-
-      - name: Check available disk space
-        run: df -h
+          echo "IMAGE_TAG=todoapp:$(date +%s)-${GITHUB_SHA::8}" >> $GITHUB_ENV
 
       - name: Build Docker image
         run: |
           docker build -t "${{ env.IMAGE_TAG }}" .
-          # Verify the image was built
           docker image ls | grep "${{ env.IMAGE_TAG }}"
 
       - name: Save Docker image to a tar file
         run: |
           docker save ${{ env.IMAGE_TAG }} -o image.tar
-          # Verify the tar file was created
           ls -lh image.tar
 
       - name: Setup SSH
@@ -51,13 +34,6 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
-
-      - name: Create home directory on Droplet
-        env:
-          HOST: ${{ secrets.DROPLET_IP }}
-          USERNAME: ${{ secrets.DROPLET_USERNAME }}
-        run: |
-          ssh -i ~/.ssh/id_rsa ${USERNAME}@${HOST} "mkdir -p /home/${USERNAME}"
 
       - name: Transfer Docker image to DigitalOcean droplet
         env:
@@ -72,40 +48,64 @@ jobs:
           USERNAME: ${{ secrets.DROPLET_USERNAME }}
         run: |
           ssh -i ~/.ssh/id_rsa ${USERNAME}@${HOST} << EOF
-            # Check Docker daemon status on the Droplet
-            sudo systemctl status docker
-            
-            # Clear Docker build cache on the Droplet
-            sudo docker builder prune -a -f
-            
-            # Check available disk space on the Droplet
-            df -h
-            
-            # Load the Docker image
+            set -e  # Exit immediately if a command exits with a non-zero status
+
+            echo "Loading Docker image..."
             sudo docker load -i /home/${USERNAME}/image.tar
-            
-            # Verify the image was loaded
-            sudo docker image ls | grep "${{ env.IMAGE_TAG }}"
-            
-            # Stop and remove the existing container if it exists
+
+            echo "Stopping and removing existing container..."
             sudo docker stop my-container || true
             sudo docker rm my-container || true
-            
-            # Create Docker secrets
-            echo "${{ secrets.MONGO_CONNECTION_STRING }}" | sudo docker secret create mongo_connection_string -
-            echo "${{ secrets.MONGO_DATABASE_NAME }}" | sudo docker secret create mongo_database_name -
-            echo "${{ secrets.MONGO_COLLECTION_NAME }}" | sudo docker secret create mongo_collection_name -
-            
-            # Deploy the container using secrets
+
+            echo "Creating Docker secrets..."
+            echo "${{ secrets.MONGO_CONNECTION_STRING }}" | sudo docker secret create mongo_connection_string - || true
+            echo "${{ secrets.MONGO_DATABASE_NAME }}" | sudo docker secret create mongo_database_name - || true
+            echo "${{ secrets.MONGO_COLLECTION_NAME }}" | sudo docker secret create mongo_collection_name - || true
+
+            echo "Deploying new container..."
             sudo docker run -d --name my-container -p 8081:8080 \
               --secret mongo_connection_string \
               --secret mongo_database_name \
               --secret mongo_collection_name \
+              --health-cmd="curl -f http://localhost:8080/health || exit 1" \
+              --health-interval=30s \
+              --health-timeout=10s \
+              --health-retries=3 \
               ${{ env.IMAGE_TAG }}
-            
-            # Verify the container is running
+
+            echo "Waiting for container to be healthy..."
+            timeout 300s bash -c 'while [[ "$(sudo docker inspect -f {{.State.Health.Status}} my-container)" != "healthy" ]]; do sleep 5; done' || (echo "Container failed to become healthy" && exit 1)
+
+            echo "Verifying container is running..."
             sudo docker ps | grep my-container
-            
-            # Clean up
+
+            echo "Cleaning up..."
             rm /home/${USERNAME}/image.tar
+
+            echo "Deployment completed successfully!"
+          EOF
+
+      - name: Verify Deployment
+        env:
+          HOST: ${{ secrets.DROPLET_IP }}
+          USERNAME: ${{ secrets.DROPLET_USERNAME }}
+        run: |
+          ssh -i ~/.ssh/id_rsa ${USERNAME}@${HOST} "curl -sSf http://localhost:8081/health || (echo 'Health check failed' && exit 1)"
+
+      - name: Rollback on Failure
+        if: failure()
+        env:
+          HOST: ${{ secrets.DROPLET_IP }}
+          USERNAME: ${{ secrets.DROPLET_USERNAME }}
+        run: |
+          ssh -i ~/.ssh/id_rsa ${USERNAME}@${HOST} << EOF
+            echo "Deployment failed. Rolling back..."
+            sudo docker stop my-container || true
+            sudo docker rm my-container || true
+            sudo docker run -d --name my-container -p 8081:8080 \
+              --secret mongo_connection_string \
+              --secret mongo_database_name \
+              --secret mongo_collection_name \
+              $(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep todoapp | head -n 2 | tail -n 1)
+            echo "Rollback completed."
           EOF
