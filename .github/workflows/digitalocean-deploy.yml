@@ -20,11 +20,17 @@ jobs:
         run: |
           echo "IMAGE_TAG=todoapp:$(date +%s)" >> $GITHUB_ENV
 
-      - name: Build Docker image with secrets
+      - name: Build Docker image
         run: |
+          # Initialize Docker Swarm
+          docker swarm init || true
+          
+          # Create Docker secrets
           echo "${{ secrets.MONGO_CONNECTION_STRING }}" | docker secret create mongo_connection_string -
           echo "${{ secrets.MONGO_DATABASE_NAME }}" | docker secret create mongo_database_name -
           echo "${{ secrets.MONGO_COLLECTION_NAME }}" | docker secret create mongo_collection_name -
+          
+          # Build the Docker image
           docker buildx build -t "${{ env.IMAGE_TAG }}" .
 
       - name: Save Docker image to a tar file
