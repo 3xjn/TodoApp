@@ -45,3 +45,4 @@ C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\obj\Debug\net8.0\TodoAppAPI.ge
 C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\obj\Debug\net8.0\ref\TodoAppAPI.dll
 C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\bin\Debug\net8.0\Swashbuckle.AspNetCore.Annotations.dll
 C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\bin\Debug\net8.0\TodoAppAPI.staticwebassets.runtime.json
+C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\obj\Debug\net8.0\TodoAppAPI.sourcelink.json

@@ -29,7 +29,7 @@ builder.Services.AddCors(options =>
 IConfiguration config = new ConfigurationBuilder()
         .AddJsonFile("appsettings.json", true, true)
         .AddJsonFile("local.appsettings.json", true, true)
-        .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+        .AddUserSecrets<Program>(optional: true)
         .AddEnvironmentVariables()
         .Build();
 
