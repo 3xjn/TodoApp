@@ -27,6 +27,8 @@ jobs:
             --build-arg MONGO_DATABASE_NAME=${{ secrets.MONGO_DATABASE_NAME }} \
             --build-arg MONGO_COLLECTION_NAME=${{ secrets.MONGO_COLLECTION_NAME }} \
             .
+        shell: bash
+
 
       - name: Save Docker image to a tar file
         run: |
