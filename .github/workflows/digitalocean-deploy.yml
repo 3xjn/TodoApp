@@ -19,9 +19,20 @@ jobs:
         run: |
           echo "IMAGE_TAG=todoapp:$(date +%s)" >> $GITHUB_ENV
 
+      - name: Check Docker daemon status
+        run: |
+          sudo systemctl status docker
+          docker info
+
+      - name: Clear Docker build cache
+        run: docker builder prune -a -f
+
+      - name: Check available disk space
+        run: df -h
+
       - name: Build Docker image
         run: |
-          docker buildx build --load -t "${{ env.IMAGE_TAG }}" .
+          docker build -t "${{ env.IMAGE_TAG }}" .
           # Verify the image was built
           docker image ls | grep "${{ env.IMAGE_TAG }}"
 
@@ -61,25 +72,40 @@ jobs:
           USERNAME: ${{ secrets.DROPLET_USERNAME }}
         run: |
           ssh -i ~/.ssh/id_rsa ${USERNAME}@${HOST} << EOF
+            # Check Docker daemon status on the Droplet
+            sudo systemctl status docker
+            
+            # Clear Docker build cache on the Droplet
+            sudo docker builder prune -a -f
+            
+            # Check available disk space on the Droplet
+            df -h
+            
             # Load the Docker image
             sudo docker load -i /home/${USERNAME}/image.tar
+            
             # Verify the image was loaded
             sudo docker image ls | grep "${{ env.IMAGE_TAG }}"
+            
             # Stop and remove the existing container if it exists
             sudo docker stop my-container || true
             sudo docker rm my-container || true
+            
             # Create Docker secrets
             echo "${{ secrets.MONGO_CONNECTION_STRING }}" | sudo docker secret create mongo_connection_string -
             echo "${{ secrets.MONGO_DATABASE_NAME }}" | sudo docker secret create mongo_database_name -
             echo "${{ secrets.MONGO_COLLECTION_NAME }}" | sudo docker secret create mongo_collection_name -
+            
             # Deploy the container using secrets
             sudo docker run -d --name my-container -p 8081:8080 \
               --secret mongo_connection_string \
               --secret mongo_database_name \
               --secret mongo_collection_name \
               ${{ env.IMAGE_TAG }}
+            
             # Verify the container is running
             sudo docker ps | grep my-container
+            
             # Clean up
             rm /home/${USERNAME}/image.tar
           EOF
