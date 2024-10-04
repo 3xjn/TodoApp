@@ -8,7 +8,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -22,20 +21,15 @@ jobs:
 
       - name: Build Docker image
         run: |
-          # Initialize Docker Swarm
-          docker swarm init || true
-          
-          # Create Docker secrets
-          echo "${{ secrets.MONGO_CONNECTION_STRING }}" | docker secret create mongo_connection_string -
-          echo "${{ secrets.MONGO_DATABASE_NAME }}" | docker secret create mongo_database_name -
-          echo "${{ secrets.MONGO_COLLECTION_NAME }}" | docker secret create mongo_collection_name -
-          
-          # Build the Docker image
-          docker buildx build -t "${{ env.IMAGE_TAG }}" .
+          docker buildx build --load -t "${{ env.IMAGE_TAG }}" .
+          # Verify the image was built
+          docker image ls | grep "${{ env.IMAGE_TAG }}"
 
       - name: Save Docker image to a tar file
         run: |
           docker save ${{ env.IMAGE_TAG }} -o image.tar
+          # Verify the tar file was created
+          ls -lh image.tar
 
       - name: Setup SSH
         env:
@@ -61,29 +55,31 @@ jobs:
         run: |
           scp -i ~/.ssh/id_rsa image.tar ${USERNAME}@${HOST}:/home/${USERNAME}/image.tar
 
-      - name: SSH into Droplet, Initialize Swarm, and Load Docker Image
+      - name: SSH into Droplet and Deploy
         env:
           HOST: ${{ secrets.DROPLET_IP }}
           USERNAME: ${{ secrets.DROPLET_USERNAME }}
         run: |
           ssh -i ~/.ssh/id_rsa ${USERNAME}@${HOST} << EOF
-            # Initialize Docker Swarm if not already initialized
-            docker info | grep 'Swarm: active' || docker swarm init
-
             # Load the Docker image
             sudo docker load -i /home/${USERNAME}/image.tar
-
+            # Verify the image was loaded
+            sudo docker image ls | grep "${{ env.IMAGE_TAG }}"
             # Stop and remove the existing container if it exists
             sudo docker stop my-container || true
             sudo docker rm my-container || true
-
+            # Create Docker secrets
+            echo "${{ secrets.MONGO_CONNECTION_STRING }}" | sudo docker secret create mongo_connection_string -
+            echo "${{ secrets.MONGO_DATABASE_NAME }}" | sudo docker secret create mongo_database_name -
+            echo "${{ secrets.MONGO_COLLECTION_NAME }}" | sudo docker secret create mongo_collection_name -
             # Deploy the container using secrets
             sudo docker run -d --name my-container -p 8081:8080 \
               --secret mongo_connection_string \
               --secret mongo_database_name \
               --secret mongo_collection_name \
               ${{ env.IMAGE_TAG }}
-
+            # Verify the container is running
+            sudo docker ps | grep my-container
             # Clean up
             rm /home/${USERNAME}/image.tar
           EOF
