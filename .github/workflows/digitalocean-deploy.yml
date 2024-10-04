@@ -20,7 +20,7 @@ jobs:
         run: |
           echo "IMAGE_TAG=todoapp:$(date +%s)" >> $GITHUB_ENV
 
-      - name: Build Docker image
+      - name: Build Docker image with secrets
         run: |
           echo "${{ secrets.MONGO_CONNECTION_STRING }}" | docker secret create mongo_connection_string -
           echo "${{ secrets.MONGO_DATABASE_NAME }}" | docker secret create mongo_database_name -
@@ -55,19 +55,29 @@ jobs:
         run: |
           scp -i ~/.ssh/id_rsa image.tar ${USERNAME}@${HOST}:/home/${USERNAME}/image.tar
 
-      - name: SSH into Droplet and Load Docker Image
+      - name: SSH into Droplet, Initialize Swarm, and Load Docker Image
         env:
           HOST: ${{ secrets.DROPLET_IP }}
           USERNAME: ${{ secrets.DROPLET_USERNAME }}
         run: |
           ssh -i ~/.ssh/id_rsa ${USERNAME}@${HOST} << EOF
+            # Initialize Docker Swarm if not already initialized
+            docker info | grep 'Swarm: active' || docker swarm init
+
+            # Load the Docker image
             sudo docker load -i /home/${USERNAME}/image.tar
+
+            # Stop and remove the existing container if it exists
             sudo docker stop my-container || true
             sudo docker rm my-container || true
+
+            # Deploy the container using secrets
             sudo docker run -d --name my-container -p 8081:8080 \
               --secret mongo_connection_string \
               --secret mongo_database_name \
               --secret mongo_collection_name \
               ${{ env.IMAGE_TAG }}
+
+            # Clean up
             rm /home/${USERNAME}/image.tar
           EOF
