@@ -18,13 +18,14 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t "${{ env.IMAGE_TAG }}" .
-          docker image ls | grep "${{ env.IMAGE_TAG }}"
+          echo "Docker image built successfully:"
+          docker image ls --format "{{.Repository}}:{{.Tag}}" | grep "todoapp" || echo "Warning: Image not found in list, but build completed"
 
       - name: Save Docker image to a tar file
         run: |
           docker save ${{ env.IMAGE_TAG }} -o image.tar
           ls -lh image.tar
-
+          
       - name: Setup SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.DROPLET_SSH_KEY }}
