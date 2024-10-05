@@ -45,28 +45,35 @@ jobs:
 
       - name: Transfer docker image
         run: |
-          scp -i ~/.ssh/id_rsa image.tar ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }}:/home/${{ secrets.DROPLET_USERNAME }}/image.tar
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa image.tar ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }}:/home/${{ secrets.DROPLET_USERNAME }}/image.tar
 
       - name: SSH into Droplet and Deploy
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }} << EOF
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }} << EOF
             set -e
+            echo "Initializing Docker Swarm..."
+            sudo docker swarm init || echo "Swarm already initialized"
+
             echo "Loading Docker image..."
             sudo docker load -i /home/${{ secrets.DROPLET_USERNAME }}/image.tar
-            echo "Stopping and removing existing container..."
-            sudo docker stop my-container || true
-            sudo docker rm my-container || true
+
+            echo "Stopping and removing existing service if it exists..."
+            sudo docker service rm my-container || true
+
             echo "Creating Docker secrets..."
             echo "${{ secrets.MONGO_CONNECTION_STRING }}" | sudo docker secret create mongo_connection_string - || true
             echo "${{ secrets.MONGO_DATABASE_NAME }}" | sudo docker secret create mongo_database_name - || true
             echo "${{ secrets.MONGO_COLLECTION_NAME }}" | sudo docker secret create mongo_collection_name - || true
-            echo "Deploying new container..."
+
+            echo "Deploying new service..."
             sudo docker service create --name my-container --publish published=8081,target=8080 \
               --secret mongo_connection_string \
               --secret mongo_database_name \
               --secret mongo_collection_name \
               ${{ env.IMAGE_TAG }}
+
             echo "Cleaning up..."
             rm /home/${{ secrets.DROPLET_USERNAME }}/image.tar
+
             echo "Deployment completed successfully!"
           EOF
