@@ -20,33 +20,27 @@ jobs:
           key: ${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile', '**/*.py', '**/*.js') }}
           restore-keys: |
             ${{ runner.os }}-docker-
-
       - name: Set up Docker Image Tag
         run: |
           echo "IMAGE_TAG=todoapp:$(date +%s)-${GITHUB_SHA::8}" >> $GITHUB_ENV
-
       - name: Build Docker image
         run: |
           docker build --cache-from=type=local,src=/tmp/.docker-cache -t "${{ env.IMAGE_TAG }}" .
           echo "Docker image built successfully:"
           docker image ls --format "{{.Repository}}:{{.Tag}}" | grep "todoapp" || echo "Warning: Image not found in list, but build completed"
-
       - name: Save Docker image to a tar file
         run: |
           docker save ${{ env.IMAGE_TAG }} -o image.tar
           ls -lh image.tar
-
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
-
       - name: Transfer docker image
         run: |
           scp -i ~/.ssh/id_rsa image.tar ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }}:/home/${{ secrets.DROPLET_USERNAME }}/image.tar
-
       - name: SSH into Droplet and Deploy to Swarm
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }} << EOF
@@ -60,16 +54,12 @@ jobs:
             echo "${{ secrets.MONGO_DATABASE_NAME }}" | sudo docker secret create mongo_database_name - || sudo docker secret update mongo_database_name -
             echo "${{ secrets.MONGO_COLLECTION_NAME }}" | sudo docker secret create mongo_collection_name - || sudo docker secret update mongo_collection_name -
             echo "Deploying service to Docker Swarm..."
-            sudo docker service update --force --image ${{ env.IMAGE_TAG }} \
-              --name my-container --publish published=8081,target=8080 \
-              --secret mongo_connection_string \
-              --secret mongo_database_name \
-              --secret mongo_collection_name || \
             sudo docker service create --name my-container --publish published=8081,target=8080 \
               --secret mongo_connection_string \
               --secret mongo_database_name \
               --secret mongo_collection_name \
-              ${{ env.IMAGE_TAG }}
+              ${{ env.IMAGE_TAG }} || \
+            sudo docker service update --force --image ${{ env.IMAGE_TAG }} my-container
             echo "Cleaning up..."
             rm /home/${{ secrets.DROPLET_USERNAME }}/image.tar
             echo "Deployment completed successfully!"
