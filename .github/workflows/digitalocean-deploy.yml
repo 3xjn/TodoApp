@@ -27,21 +27,17 @@ jobs:
           ls -lh image.tar
 
       - name: Setup SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.DROPLET_SSH_KEY }}
-          KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
-
-      - name: Transfer Docker image to DigitalOcean droplet
+          ssh-keyscan -H ${HOST} >> ~/.ssh/known_hosts
+    
+      - name: Transfer docker image
+        run: scp -i ~/.ssh/id_rsa image.tar ${USERNAME}@${HOST}:/home/${USERNAME}/image.tar
         env:
-          HOST: ${{ secrets.DROPLET_IP }}
-          USERNAME: ${{ secrets.DROPLET_USERNAME }}
-        run: |
-          scp -i ~/.ssh/id_rsa image.tar ${USERNAME}@${HOST}:/home/${USERNAME}/image.tar
+          USERNAME: ${{ secrets.USERNAME }}
+          HOST: ${{ secrets.HOST }}
 
       - name: SSH into Droplet and Deploy
         env:
