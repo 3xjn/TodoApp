@@ -11,13 +11,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Cache Docker layers
+        id: docker-cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            /tmp/.docker-cache
+          key: ${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile', '**/*.py', '**/*.js') }}  # Add other file patterns as necessary
+          restore-keys: |
+            ${{ runner.os }}-docker-
+
       - name: Set up Docker Image Tag
         run: |
           echo "IMAGE_TAG=todoapp:$(date +%s)-${GITHUB_SHA::8}" >> $GITHUB_ENV
 
       - name: Build Docker image
         run: |
-          docker build -t "${{ env.IMAGE_TAG }}" .
+          docker build --cache-from=type=local,src=/tmp/.docker-cache -t "${{ env.IMAGE_TAG }}" .
           echo "Docker image built successfully:"
           docker image ls --format "{{.Repository}}:{{.Tag}}" | grep "todoapp" || echo "Warning: Image not found in list, but build completed"
 
