@@ -61,7 +61,7 @@ jobs:
             echo "${{ secrets.MONGO_DATABASE_NAME }}" | sudo docker secret create mongo_database_name - || true
             echo "${{ secrets.MONGO_COLLECTION_NAME }}" | sudo docker secret create mongo_collection_name - || true
             echo "Deploying new container..."
-            sudo docker run -d --name my-container -p 8081:8080 \
+            sudo docker service create --name my-container --publish published=8081,target=8080 \
               --secret mongo_connection_string \
               --secret mongo_database_name \
               --secret mongo_collection_name \
