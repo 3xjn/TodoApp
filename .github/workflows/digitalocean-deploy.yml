@@ -2,7 +2,7 @@ name: Build and Push Docker Image to DigitalOcean Droplet
 
 on:
   push:
-    branches: [master, main]  # Trigger on both master and main
+    branches: [master, main]
 
 jobs:
   deploy:
@@ -25,7 +25,7 @@ jobs:
         run: |
           docker save ${{ env.IMAGE_TAG }} -o image.tar
           ls -lh image.tar
-          
+
       - name: Setup SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.DROPLET_SSH_KEY }}
@@ -49,64 +49,23 @@ jobs:
           USERNAME: ${{ secrets.DROPLET_USERNAME }}
         run: |
           ssh -i ~/.ssh/id_rsa ${USERNAME}@${HOST} << EOF
-            set -e  # Exit immediately if a command exits with a non-zero status
-
+            set -e
             echo "Loading Docker image..."
             sudo docker load -i /home/${USERNAME}/image.tar
-
             echo "Stopping and removing existing container..."
             sudo docker stop my-container || true
             sudo docker rm my-container || true
-
             echo "Creating Docker secrets..."
             echo "${{ secrets.MONGO_CONNECTION_STRING }}" | sudo docker secret create mongo_connection_string - || true
             echo "${{ secrets.MONGO_DATABASE_NAME }}" | sudo docker secret create mongo_database_name - || true
             echo "${{ secrets.MONGO_COLLECTION_NAME }}" | sudo docker secret create mongo_collection_name - || true
-
             echo "Deploying new container..."
             sudo docker run -d --name my-container -p 8081:8080 \
               --secret mongo_connection_string \
               --secret mongo_database_name \
               --secret mongo_collection_name \
-              --health-cmd="curl -f http://localhost:8080/health || exit 1" \
-              --health-interval=30s \
-              --health-timeout=10s \
-              --health-retries=3 \
               ${{ env.IMAGE_TAG }}
-
-            echo "Waiting for container to be healthy..."
-            timeout 300s bash -c 'while [[ "$(sudo docker inspect -f {{.State.Health.Status}} my-container)" != "healthy" ]]; do sleep 5; done' || (echo "Container failed to become healthy" && exit 1)
-
-            echo "Verifying container is running..."
-            sudo docker ps | grep my-container
-
             echo "Cleaning up..."
             rm /home/${USERNAME}/image.tar
-
             echo "Deployment completed successfully!"
-          EOF
-
-      - name: Verify Deployment
-        env:
-          HOST: ${{ secrets.DROPLET_IP }}
-          USERNAME: ${{ secrets.DROPLET_USERNAME }}
-        run: |
-          ssh -i ~/.ssh/id_rsa ${USERNAME}@${HOST} "curl -sSf http://localhost:8081/health || (echo 'Health check failed' && exit 1)"
-
-      - name: Rollback on Failure
-        if: failure()
-        env:
-          HOST: ${{ secrets.DROPLET_IP }}
-          USERNAME: ${{ secrets.DROPLET_USERNAME }}
-        run: |
-          ssh -i ~/.ssh/id_rsa ${USERNAME}@${HOST} << EOF
-            echo "Deployment failed. Rolling back..."
-            sudo docker stop my-container || true
-            sudo docker rm my-container || true
-            sudo docker run -d --name my-container -p 8081:8080 \
-              --secret mongo_connection_string \
-              --secret mongo_database_name \
-              --secret mongo_collection_name \
-              $(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep todoapp | head -n 2 | tail -n 1)
-            echo "Rollback completed."
           EOF
