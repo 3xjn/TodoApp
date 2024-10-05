@@ -49,10 +49,24 @@ jobs:
             sudo docker swarm init --advertise-addr 10.10.0.5 || echo "Swarm already initialized"
             echo "Loading Docker image..."
             sudo docker load -i /home/${{ secrets.DROPLET_USERNAME }}/image.tar
-            echo "Creating or updating Docker secrets..."
-            echo "${{ secrets.MONGO_CONNECTION_STRING }}" | sudo docker secret create mongo_connection_string - || sudo docker secret update mongo_connection_string -
-            echo "${{ secrets.MONGO_DATABASE_NAME }}" | sudo docker secret create mongo_database_name - || sudo docker secret update mongo_database_name -
-            echo "${{ secrets.MONGO_COLLECTION_NAME }}" | sudo docker secret create mongo_collection_name - || sudo docker secret update mongo_collection_name -
+
+            echo "Checking if Docker secrets already exist and creating if necessary..."
+            if ! sudo docker secret ls | grep -q "mongo_connection_string"; then
+              echo "${{ secrets.MONGO_CONNECTION_STRING }}" | sudo docker secret create mongo_connection_string -
+            else
+              echo "Secret mongo_connection_string already exists."
+            fi
+            if ! sudo docker secret ls | grep -q "mongo_database_name"; then
+              echo "${{ secrets.MONGO_DATABASE_NAME }}" | sudo docker secret create mongo_database_name -
+            else
+              echo "Secret mongo_database_name already exists."
+            fi
+            if ! sudo docker secret ls | grep -q "mongo_collection_name"; then
+              echo "${{ secrets.MONGO_COLLECTION_NAME }}" | sudo docker secret create mongo_collection_name -
+            else
+              echo "Secret mongo_collection_name already exists."
+            fi
+
             echo "Deploying service to Docker Swarm..."
             sudo docker service create --name my-container --publish published=8081,target=8080 \
               --secret mongo_connection_string \
@@ -60,6 +74,7 @@ jobs:
               --secret mongo_collection_name \
               ${{ env.IMAGE_TAG }} || \
             sudo docker service update --force --image ${{ env.IMAGE_TAG }} my-container
+
             echo "Cleaning up..."
             rm /home/${{ secrets.DROPLET_USERNAME }}/image.tar
             echo "Deployment completed successfully!"
