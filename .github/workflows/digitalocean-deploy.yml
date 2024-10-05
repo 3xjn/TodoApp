@@ -41,39 +41,24 @@ jobs:
       - name: Transfer docker image
         run: |
           scp -i ~/.ssh/id_rsa image.tar ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }}:/home/${{ secrets.DROPLET_USERNAME }}/image.tar
-      - name: SSH into Droplet and Deploy to Swarm
+      - name: SSH into Droplet and Deploy using Docker
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }} << EOF
             set -e
-            echo "Initializing Docker Swarm if necessary..."
-            sudo docker swarm init --advertise-addr 10.10.0.5 || echo "Swarm already initialized"
             echo "Loading Docker image..."
             sudo docker load -i /home/${{ secrets.DROPLET_USERNAME }}/image.tar
 
-            echo "Checking if Docker secrets already exist and creating if necessary..."
-            if ! sudo docker secret ls | grep -q "mongo_connection_string"; then
-              echo "${{ secrets.MONGO_CONNECTION_STRING }}" | sudo docker secret create mongo_connection_string -
-            else
-              echo "Secret mongo_connection_string already exists."
-            fi
-            if ! sudo docker secret ls | grep -q "mongo_database_name"; then
-              echo "${{ secrets.MONGO_DATABASE_NAME }}" | sudo docker secret create mongo_database_name -
-            else
-              echo "Secret mongo_database_name already exists."
-            fi
-            if ! sudo docker secret ls | grep -q "mongo_collection_name"; then
-              echo "${{ secrets.MONGO_COLLECTION_NAME }}" | sudo docker secret create mongo_collection_name -
-            else
-              echo "Secret mongo_collection_name already exists."
-            fi
+            echo "Stopping and removing any existing container..."
+            sudo docker stop my-container || echo "No container to stop"
+            sudo docker rm my-container || echo "No container to remove"
 
-            echo "Deploying service to Docker Swarm..."
-            sudo docker service create --name my-container --publish published=8081,target=8080 \
-              --secret mongo_connection_string \
-              --secret mongo_database_name \
-              --secret mongo_collection_name \
-              ${{ env.IMAGE_TAG }} || \
-            sudo docker service update --force --image ${{ env.IMAGE_TAG }} my-container
+            echo "Running Docker container..."
+            sudo docker run -d --name my-container \
+              -p 8081:8080 \
+              --env MONGO_CONNECTION_STRING="${{ secrets.MONGO_CONNECTION_STRING }}" \
+              --env MONGO_DATABASE_NAME="${{ secrets.MONGO_DATABASE_NAME }}" \
+              --env MONGO_COLLECTION_NAME="${{ secrets.MONGO_COLLECTION_NAME }}" \
+              ${{ env.IMAGE_TAG }}
 
             echo "Cleaning up..."
             rm /home/${{ secrets.DROPLET_USERNAME }}/image.tar
