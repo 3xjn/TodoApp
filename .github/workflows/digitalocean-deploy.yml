@@ -29,25 +29,19 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.DROPLET_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${HOST} >> ~/.ssh/known_hosts
-    
+          ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
+
       - name: Transfer docker image
-        run: scp -i ~/.ssh/id_rsa image.tar ${USERNAME}@${HOST}:/home/${USERNAME}/image.tar
-        env:
-          USERNAME: ${{ secrets.USERNAME }}
-          HOST: ${{ secrets.HOST }}
+        run: scp -i ~/.ssh/id_rsa image.tar ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }}:/home/${{ secrets.DROPLET_USERNAME }}/image.tar
 
       - name: SSH into Droplet and Deploy
-        env:
-          HOST: ${{ secrets.DROPLET_IP }}
-          USERNAME: ${{ secrets.DROPLET_USERNAME }}
         run: |
-          ssh -i ~/.ssh/id_rsa ${USERNAME}@${HOST} << EOF
+          ssh -i ~/.ssh/id_rsa ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }} << EOF
             set -e
             echo "Loading Docker image..."
-            sudo docker load -i /home/${USERNAME}/image.tar
+            sudo docker load -i /home/${{ secrets.DROPLET_USERNAME }}/image.tar
             echo "Stopping and removing existing container..."
             sudo docker stop my-container || true
             sudo docker rm my-container || true
@@ -62,6 +56,6 @@ jobs:
               --secret mongo_collection_name \
               ${{ env.IMAGE_TAG }}
             echo "Cleaning up..."
-            rm /home/${USERNAME}/image.tar
+            rm /home/${{ secrets.DROPLET_USERNAME }}/image.tar
             echo "Deployment completed successfully!"
           EOF
