@@ -55,9 +55,9 @@ jobs:
             echo "Running Docker container..."
             sudo docker run -d --name my-container \
               -p 8081:8080 \
-              --env MONGO_CONNECTION_STRING="${{ secrets.MONGO_CONNECTION_STRING }}" \
-              --env MONGO_DATABASE_NAME="${{ secrets.MONGO_DATABASE_NAME }}" \
-              --env MONGO_COLLECTION_NAME="${{ secrets.MONGO_COLLECTION_NAME }}" \
+              --env MONGO__ConnectionString="${{ secrets.MONGO_CONNECTION_STRING }}" \
+              --env MONGO__DatabaseName="${{ secrets.MONGO_DATABASE_NAME }}" \
+              --env MONGO__CollectionName="${{ secrets.MONGO_COLLECTION_NAME }}" \
               ${{ env.IMAGE_TAG }}
 
             echo "Cleaning up..."
