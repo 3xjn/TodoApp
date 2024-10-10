@@ -1,8 +1,8 @@
 [
   {
-    "ContainingType": "TodoAppAPI.Controllers.TodoAppController",
+    "ContainingType": "TodoAppAPI.Controllers.TodoController",
     "Method": "GetAll",
-    "RelativePath": "api/TodoApp",
+    "RelativePath": "api/Todo",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -20,9 +20,9 @@
     ]
   },
   {
-    "ContainingType": "TodoAppAPI.Controllers.TodoAppController",
+    "ContainingType": "TodoAppAPI.Controllers.TodoController",
     "Method": "Create",
-    "RelativePath": "api/TodoApp",
+    "RelativePath": "api/Todo",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -36,9 +36,9 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "TodoAppAPI.Controllers.TodoAppController",
+    "ContainingType": "TodoAppAPI.Controllers.TodoController",
     "Method": "Get",
-    "RelativePath": "api/TodoApp/{id}",
+    "RelativePath": "api/Todo/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -62,10 +62,10 @@
     ]
   },
   {
-    "ContainingType": "TodoAppAPI.Controllers.TodoAppController",
+    "ContainingType": "TodoAppAPI.Controllers.TodoController",
     "Method": "Delete",
-    "RelativePath": "delete",
-    "HttpMethod": "POST",
+    "RelativePath": "api/Todo/delete",
+    "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
     "Parameters": [
@@ -78,16 +78,16 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "TodoAppAPI.Controllers.TodoAppController",
-    "Method": "Save",
-    "RelativePath": "save",
-    "HttpMethod": "POST",
+    "ContainingType": "TodoAppAPI.Controllers.TodoController",
+    "Method": "Update",
+    "RelativePath": "api/Todo/update",
+    "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "todos",
-        "Type": "TodoAppAPI.Models.Todo[]",
+        "Name": "todo",
+        "Type": "TodoAppAPI.Models.TodoDto",
         "IsRequired": true
       }
     ],

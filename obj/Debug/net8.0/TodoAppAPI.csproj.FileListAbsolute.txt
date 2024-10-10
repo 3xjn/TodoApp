@@ -46,3 +46,4 @@ C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\obj\Debug\net8.0\ref\TodoAppAP
 C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\bin\Debug\net8.0\Swashbuckle.AspNetCore.Annotations.dll
 C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\bin\Debug\net8.0\TodoAppAPI.staticwebassets.runtime.json
 C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\obj\Debug\net8.0\TodoAppAPI.sourcelink.json
+C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\bin\Debug\net8.0\AutoMapper.dll

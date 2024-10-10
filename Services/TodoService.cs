@@ -25,7 +25,23 @@ namespace TodoAppAPI.Services
             return todo;
         }
 
-        public void Update(string id, Todo updatedTodo) => _todos.ReplaceOne(todo => todo.Id == id, updatedTodo);
+        public void Update(TodoDto updateTodo)
+        {
+            var update = Builders<Todo>.Update;
+            var updates = new List<UpdateDefinition<Todo>>();
+
+
+            if (updateTodo.Title != null)
+                updates.Add(update.Set(p => p.Title, updateTodo.Title));
+
+            if (updateTodo.Content != null)
+                updates.Add(update.Set(p => p.Content, updateTodo.Content));
+
+            if (updateTodo.Order != null)
+                updates.Add(update.Set(p => p.Order, updateTodo.Order));
+
+            _todos.UpdateOneAsync(todo => todo.Id == updateTodo.Id, update.Combine(updates));
+        }
 
         public void Delete(Todo TodoForDeletion) => _todos.DeleteOne(todo => todo.Id == TodoForDeletion.Id);
 
