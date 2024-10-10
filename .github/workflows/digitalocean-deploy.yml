@@ -1,16 +1,13 @@
 name: Build and Push Docker Image to DigitalOcean Droplet
-
 on:
   push:
     branches: [master, main]
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Cache Docker layers
         id: docker-cache
         uses: actions/cache@v3
@@ -43,15 +40,13 @@ jobs:
           scp -i ~/.ssh/id_rsa image.tar ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }}:/home/${{ secrets.DROPLET_USERNAME }}/image.tar
       - name: SSH into Droplet and Deploy using Docker
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }} << EOF
+          ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=10 -i ~/.ssh/id_rsa ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }} << EOF
             set -e
             echo "Loading Docker image..."
             sudo docker load -i /home/${{ secrets.DROPLET_USERNAME }}/image.tar
-
             echo "Stopping and removing any existing container..."
             sudo docker stop my-container || echo "No container to stop"
             sudo docker rm my-container || echo "No container to remove"
-
             echo "Running Docker container..."
             sudo docker run -d --name my-container \
               -p 8081:8080 \
@@ -59,7 +54,6 @@ jobs:
               --env MONGO__DatabaseName="${{ secrets.MONGO_DATABASE_NAME }}" \
               --env MONGO__CollectionName="${{ secrets.MONGO_COLLECTION_NAME }}" \
               ${{ env.IMAGE_TAG }}
-
             echo "Cleaning up..."
             rm /home/${{ secrets.DROPLET_USERNAME }}/image.tar
             echo "Deployment completed successfully!"
