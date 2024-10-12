@@ -1,20 +1,20 @@
 {
   "Files": [
     {
-      "Id": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\index.css",
-      "PackagePath": "staticwebassets\\app\\index.css"
+      "Id": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\assets\\index-Bg-Mm9vd.css",
+      "PackagePath": "staticwebassets\\app\\assets\\index-Bg-Mm9vd.css"
+    },
+    {
+      "Id": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\assets\\index-eQqy81Fe.js",
+      "PackagePath": "staticwebassets\\app\\assets\\index-eQqy81Fe.js"
+    },
+    {
+      "Id": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\assets\\index-eQqy81Fe.js.map",
+      "PackagePath": "staticwebassets\\app\\assets\\index-eQqy81Fe.js.map"
     },
     {
       "Id": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\index.html",
       "PackagePath": "staticwebassets\\app\\index.html"
-    },
-    {
-      "Id": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\index.js",
-      "PackagePath": "staticwebassets\\app\\index.js"
-    },
-    {
-      "Id": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\index.js.map",
-      "PackagePath": "staticwebassets\\app\\index.js.map"
     },
     {
       "Id": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\vite.svg",

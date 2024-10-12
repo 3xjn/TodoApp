@@ -47,3 +47,8 @@ C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\bin\Debug\net8.0\Swashbuckle.A
 C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\bin\Debug\net8.0\TodoAppAPI.staticwebassets.runtime.json
 C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\obj\Debug\net8.0\TodoAppAPI.sourcelink.json
 C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\bin\Debug\net8.0\AutoMapper.dll
+C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\bin\Debug\net8.0\Certes.dll
+C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\bin\Debug\net8.0\LettuceEncrypt.dll
+C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\bin\Debug\net8.0\McMaster.AspNetCore.Kestrel.Certificates.dll
+C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Users\asher\source\repos\TodoAppAPI\TodoAppAPI\bin\Debug\net8.0\BouncyCastle.Crypto.dll
