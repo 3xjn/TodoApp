@@ -75,8 +75,6 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = staticFileProvider
 });
 
-app.UseHttpsRedirection();
-
 app.UseCors("AllowAll");
 
 app.MapControllers();
