@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using LettuceEncrypt;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -50,7 +51,8 @@ builder.Services.AddScoped<TodoService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddLettuceEncrypt();
+builder.Services.AddLettuceEncrypt().PersistDataToDirectory(new DirectoryInfo(AppContext.BaseDirectory), "abc123456");\
+
 
 var app = builder.Build();
 
