@@ -20,8 +20,17 @@ RUN dotnet publish "TodoAppAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /
 
 # Final stage for production
 FROM base AS final
+
+# Create a group and user with specific IDs to match your host's permissions
+RUN addgroup --gid 1000 appgroup && \
+    adduser --uid 1000 --gid 1000 --home /app --shell /bin/sh --disabled-password appuser
 WORKDIR /app
+# Set permissions to ensure appuser can access everything in /app
+RUN chown -R appuser:appgroup /app && chmod -R 755 /app
+
+# Switch to the non-root user
+USER appuser
+
 COPY --from=publish /app/publish .
-USER app
 HEALTHCHECK CMD curl -f http://localhost:8080/health || exit 1
 ENTRYPOINT ["dotnet", "TodoAppAPI.dll"]
