@@ -51,8 +51,7 @@ builder.Services.AddScoped<TodoService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddLettuceEncrypt().PersistDataToDirectory(new DirectoryInfo(AppContext.BaseDirectory), "abc123456");\
-
+builder.Services.AddLettuceEncrypt();
 
 var app = builder.Build();
 
