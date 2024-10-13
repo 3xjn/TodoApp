@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
@@ -49,7 +48,6 @@ builder.Services.AddScoped<TodoService>();
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddLettuceEncrypt();
