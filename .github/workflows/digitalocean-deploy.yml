@@ -44,7 +44,6 @@ jobs:
       - name: Transfer docker image and docker-compose.yml
         run: |
           scp -i ~/.ssh/id_rsa image.tar ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }}:/home/${{ secrets.DROPLET_USERNAME }}/image.tar
-          scp -i ~/.ssh/id_rsa docker-compose.yml ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }}:/home/${{ secrets.DROPLET_USERNAME }}/docker-compose.yml
 
       - name: SSH into Droplet and Deploy using Docker Compose
         run: |
@@ -77,6 +76,7 @@ jobs:
             echo "Running Docker Compose..."
             export IMAGE_TAG=${{ env.IMAGE_TAG }}
             export CERT_PFX=\$(sudo cat /home/${{ secrets.DROPLET_USERNAME }}/mycert.pfx)
+            export CERT_PFX_PASS=\$(sudo cat /home/${{ secrets.DROPLET_USERNAME }}/certpass.txt)
             
             # Export MongoDB environment variables
             export MONGO_CONNECTION_STRING="${{ secrets.MONGO_CONNECTION_STRING }}"
