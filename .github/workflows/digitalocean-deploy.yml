@@ -42,20 +42,50 @@ jobs:
         run: |
           ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=10 -i ~/.ssh/id_rsa ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }} << EOF
             set -e
+            echo "Starting deployment process..."
+            
             echo "Loading Docker image..."
-            sudo docker load -i /home/${{ secrets.DROPLET_USERNAME }}/image.tar
-            echo "Stopping and removing any existing container..."
-            sudo docker stop my-container || echo "No container to stop"
-            sudo docker rm my-container || echo "No container to remove"
+            if ! sudo docker load -i /home/${{ secrets.DROPLET_USERNAME }}/image.tar; then
+              echo "Failed to load Docker image"
+              exit 1
+            fi
+            
+            echo "Stopping and removing any existing containers..."
+            sudo docker stop my-container || echo "No my-container to stop"
+            sudo docker rm my-container || echo "No my-container to remove"
+            sudo docker stop temp-container || echo "No temp-container to stop"
+            sudo docker rm temp-container || echo "No temp-container to remove"
+            
             echo "Creating certificate directory in container..."
-            sudo docker create --name temp-container ${{ env.IMAGE_TAG }}
-            # Copy the actual certificate files, not the symlinks
-            sudo docker cp \$(readlink -f /etc/letsencrypt/live/3xjn.dev/fullchain.pem) temp-container:/app/fullchain.pem
-            sudo docker cp \$(readlink -f /etc/letsencrypt/live/3xjn.dev/privkey.pem) temp-container:/app/privkey.pem
-            sudo docker commit temp-container ${{ env.IMAGE_TAG }}
+            if ! sudo docker create --name temp-container ${{ env.IMAGE_TAG }}; then
+              echo "Failed to create temporary container"
+              exit 1
+            fi
+            
+            echo "Copying SSL certificates..."
+            if ! sudo docker cp \$(readlink -f /etc/letsencrypt/live/3xjn.dev/fullchain.pem) temp-container:/app/fullchain.pem; then
+              echo "Failed to copy fullchain.pem"
+              sudo docker rm temp-container
+              exit 1
+            fi
+            if ! sudo docker cp \$(readlink -f /etc/letsencrypt/live/3xjn.dev/privkey.pem) temp-container:/app/privkey.pem; then
+              echo "Failed to copy privkey.pem"
+              sudo docker rm temp-container
+              exit 1
+            fi
+            
+            echo "Committing changes to image..."
+            if ! sudo docker commit temp-container ${{ env.IMAGE_TAG }}; then
+              echo "Failed to commit changes to image"
+              sudo docker rm temp-container
+              exit 1
+            fi
+            
+            echo "Removing temporary container..."
             sudo docker rm temp-container
+            
             echo "Running Docker container..."
-            sudo docker run -d --name my-container \
+            if ! sudo docker run -d --name my-container \
               -p 443:443 -p 80:80 \
               -v /var/www/html/.well-known/:/app/wwwroot/.well-known/ \
               --env MONGO__ConnectionString="${{ secrets.MONGO_CONNECTION_STRING }}" \
@@ -63,8 +93,16 @@ jobs:
               --env MONGO__CollectionName="${{ secrets.MONGO_COLLECTION_NAME }}" \
               --env CERT_PATH="/app/fullchain.pem" \
               --env KEY_PATH="/app/privkey.pem" \
-              ${{ env.IMAGE_TAG }}
+              ${{ env.IMAGE_TAG }}; then
+              echo "Failed to start container"
+              exit 1
+            fi
+            
             echo "Cleaning up..."
+            rm /home/${{ secrets.DROPLET_USERNAME }}/image.tar
+            
+            echo "Deployment completed successfully!"
+          EOF
             rm /home/${{ secrets.DROPLET_USERNAME }}/image.tar
             echo "Deployment completed successfully!"
           EOF
