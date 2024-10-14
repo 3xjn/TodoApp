@@ -45,6 +45,16 @@ jobs:
         run: |
           scp -i ~/.ssh/id_rsa image.tar ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }}:/home/${{ secrets.DROPLET_USERNAME }}/image.tar
 
+      - name: Set Environment Variables
+        run: |
+          echo "CERT_PFX=$(base64 /home/${{ secrets.DROPLET_USERNAME }}/mycert.pfx)" >> $GITHUB_ENV
+          echo "CERT_PFX_PASS=$(cat /home/${{ secrets.DROPLET_USERNAME }}/certpass.txt)" >> $GITHUB_ENV
+
+          # MongoDB environment variables
+          echo "MONGO_CONNECTION_STRING=${{ secrets.MONGO_CONNECTION_STRING }}" >> $GITHUB_ENV
+          echo "MONGO_DATABASE_NAME=${{ secrets.MONGO_DATABASE_NAME }}" >> $GITHUB_ENV
+          echo "MONGO_COLLECTION_NAME=${{ secrets.MONGO_COLLECTION_NAME }}" >> $GITHUB_ENV
+
       - name: SSH into Droplet and Deploy using Docker Compose
         run: |
           ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=10 -i ~/.ssh/id_rsa ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }} << EOF
@@ -75,13 +85,6 @@ jobs:
             
             echo "Running Docker Compose..."
             export IMAGE_TAG=${{ env.IMAGE_TAG }}
-            export CERT_PFX=\$(sudo cat /home/${{ secrets.DROPLET_USERNAME }}/mycert.pfx)
-            export CERT_PFX_PASS=\$(sudo cat /home/${{ secrets.DROPLET_USERNAME }}/certpass.txt)
-            
-            # Export MongoDB environment variables
-            export MONGO_CONNECTION_STRING="${{ secrets.MONGO_CONNECTION_STRING }}"
-            export MONGO_DATABASE_NAME="${{ secrets.MONGO_DATABASE_NAME }}"
-            export MONGO_COLLECTION_NAME="${{ secrets.MONGO_COLLECTION_NAME }}"
             
             # Run the Docker Compose command
             sudo IMAGE_TAG=\$IMAGE_TAG CERT_PEM="\$CERT_PEM" KEY_PEM="\$KEY_PEM" \
