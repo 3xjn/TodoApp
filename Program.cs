@@ -52,15 +52,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var certPath = Environment.GetEnvironmentVariable("CERT_PATH") ?? "/app/fullchain.pem";
+var keyPath = Environment.GetEnvironmentVariable("KEY_PATH") ?? "/app/privkey.pem";
+
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.ListenAnyIP(80); // Optional HTTP for redirection or Certbot renewals
+    serverOptions.ListenAnyIP(80);
     serverOptions.ListenAnyIP(443, listenOptions =>
     {
         try
         {
-            listenOptions.UseHttps("/etc/letsencrypt/live/3xjn.dev/fullchain.pem",
-                                   "/etc/letsencrypt/live/3xjn.dev/privkey.pem");
+            listenOptions.UseHttps(certPath, keyPath);
         }
         catch (Exception ex)
         {
