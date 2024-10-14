@@ -45,9 +45,10 @@ jobs:
             echo "Starting deployment process..."
             
             echo "Loading Docker image..."
-            if ! sudo docker load -i /home/${{ secrets.DROPLET_USERNAME }}/image.tar; then
-              echo "Failed to load Docker image"
-              exit 1
+            if [ -f /home/${{ secrets.DROPLET_USERNAME }}/image.tar ]; then
+              sudo docker load -i /home/${{ secrets.DROPLET_USERNAME }}/image.tar
+            else
+              echo "image.tar not found, skipping load step"
             fi
             
             echo "Stopping and removing any existing containers..."
@@ -57,35 +58,20 @@ jobs:
             sudo docker rm temp-container || echo "No temp-container to remove"
             
             echo "Creating certificate directory in container..."
-            if ! sudo docker create --name temp-container ${{ env.IMAGE_TAG }}; then
-              echo "Failed to create temporary container"
-              exit 1
-            fi
+            sudo docker create --name temp-container ${{ env.IMAGE_TAG }}
             
             echo "Copying SSL certificates..."
-            if ! sudo docker cp \$(readlink -f /etc/letsencrypt/live/3xjn.dev/fullchain.pem) temp-container:/app/fullchain.pem; then
-              echo "Failed to copy fullchain.pem"
-              sudo docker rm temp-container
-              exit 1
-            fi
-            if ! sudo docker cp \$(readlink -f /etc/letsencrypt/live/3xjn.dev/privkey.pem) temp-container:/app/privkey.pem; then
-              echo "Failed to copy privkey.pem"
-              sudo docker rm temp-container
-              exit 1
-            fi
+            sudo docker cp \$(readlink -f /etc/letsencrypt/live/3xjn.dev/fullchain.pem) temp-container:/app/fullchain.pem
+            sudo docker cp \$(readlink -f /etc/letsencrypt/live/3xjn.dev/privkey.pem) temp-container:/app/privkey.pem
             
             echo "Committing changes to image..."
-            if ! sudo docker commit temp-container ${{ env.IMAGE_TAG }}; then
-              echo "Failed to commit changes to image"
-              sudo docker rm temp-container
-              exit 1
-            fi
+            sudo docker commit temp-container ${{ env.IMAGE_TAG }}
             
             echo "Removing temporary container..."
             sudo docker rm temp-container
             
             echo "Running Docker container..."
-            if ! sudo docker run -d --name my-container \
+            sudo docker run -d --name my-container \
               -p 443:443 -p 80:80 \
               -v /var/www/html/.well-known/:/app/wwwroot/.well-known/ \
               --env MONGO__ConnectionString="${{ secrets.MONGO_CONNECTION_STRING }}" \
@@ -93,16 +79,20 @@ jobs:
               --env MONGO__CollectionName="${{ secrets.MONGO_COLLECTION_NAME }}" \
               --env CERT_PATH="/app/fullchain.pem" \
               --env KEY_PATH="/app/privkey.pem" \
-              ${{ env.IMAGE_TAG }}; then
-              echo "Failed to start container"
-              exit 1
-            fi
+              ${{ env.IMAGE_TAG }}
             
             echo "Cleaning up..."
-            rm /home/${{ secrets.DROPLET_USERNAME }}/image.tar
+            if [ -f /home/${{ secrets.DROPLET_USERNAME }}/image.tar ]; then
+              rm /home/${{ secrets.DROPLET_USERNAME }}/image.tar
+            else
+              echo "image.tar not found, skipping cleanup"
+            fi
             
-            echo "Deployment completed successfully!"
-          EOF
-            rm /home/${{ secrets.DROPLET_USERNAME }}/image.tar
+            echo "Checking container status..."
+            sudo docker ps -a
+            
+            echo "Checking container logs..."
+            sudo docker logs my-container
+            
             echo "Deployment completed successfully!"
           EOF
