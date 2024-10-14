@@ -26,15 +26,12 @@ builder.Services.AddCors(options =>
     });
 });
 
-
 IConfiguration config = new ConfigurationBuilder()
         .AddJsonFile("appsettings.json", true, true)
         .AddJsonFile("local.appsettings.json", true, true)
         .AddUserSecrets<Program>(optional: true)
         .AddEnvironmentVariables()
         .Build();
-
-
 
 builder.Services.Configure<TodoDatabaseSettings>(
     config.GetSection("Mongo"));
@@ -48,13 +45,25 @@ builder.Services.AddSingleton(serviceProvider =>
 builder.Services.AddScoped<TodoService>();
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var certPath = "/etc/letsencrypt/live/3xjn.dev/fullchain.pem";
 var keyPath = "/etc/letsencrypt/live/3xjn.dev/privkey.pem";
+
+// Method to check if certificate files exist
+bool CheckCertificateFilesExist(string certPath, string keyPath)
+{
+    return File.Exists(certPath) && File.Exists(keyPath);
+}
+
+// Wait until the certificate files are found
+while (!CheckCertificateFilesExist(certPath, keyPath))
+{
+    Console.WriteLine("Waiting for certificate files to be found...");
+    await Task.Delay(1000); // Wait for 1 second
+}
 
 // Load the certificates from PEM files
 var cert = X509Certificate2.CreateFromPemFile(
