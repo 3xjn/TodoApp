@@ -49,15 +49,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Read certificate and key from mounted files
-var certPem = System.IO.File.ReadAllText("/etc/letsencrypt/live/3xjn.dev/fullchain.pem");
-var keyPem = System.IO.File.ReadAllText("/etc/letsencrypt/live/3xjn.dev/privkey.pem");
+var certPem = Environment.GetEnvironmentVariable("CERT_PEM");
+var keyPem = Environment.GetEnvironmentVariable("KEY_PEM");
 
-// Ensure both the certificate and key are provided
 if (string.IsNullOrEmpty(certPem) || string.IsNullOrEmpty(keyPem))
 {
     throw new InvalidOperationException("Certificate and key must be provided.");
 }
+
+// Debug logs
+Console.WriteLine($"CERT_PEM: {certPem}");
+Console.WriteLine($"KEY_PEM: {keyPem}");
 
 // Create the certificate from the PEM strings
 var cert = X509Certificate2.CreateFromPem(certPem, keyPem);
