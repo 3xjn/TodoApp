@@ -52,50 +52,38 @@ builder.Services.AddSwaggerGen();
 var certPath = "/etc/letsencrypt/live/3xjn.dev/fullchain.pem";
 var keyPath = "/etc/letsencrypt/live/3xjn.dev/privkey.pem";
 
-// Read the certificate and key as strings
-string certPem = await File.ReadAllTextAsync(certPath);
-string keyPem = await File.ReadAllTextAsync(keyPath);
-
-// Wait until the certificate files are found
-const int maxRetries = 30;
-const int delayBetweenRetries = 1000;
-bool certsFound = false;
-
-for (int attempt = 1; attempt <= maxRetries; attempt++)
+// Wait for certificate files with a maximum retry mechanism
+for (int attempt = 1; attempt <= 30; attempt++)
 {
     if (File.Exists(certPath) && File.Exists(keyPath))
     {
-        Console.WriteLine("Certificate files found.");
-        certsFound = true;
+        Console.WriteLine("Certificates found.");
         break;
     }
 
-    if (attempt == maxRetries)
+    if (attempt == 30)
     {
-        Console.WriteLine("Certificate files not found after multiple attempts. Exiting...");
+        throw new FileNotFoundException("Certificate files not found after multiple attempts.");
     }
 
-    Console.WriteLine($"Attempt {attempt}/{maxRetries}: Waiting for certificate files to be found...");
-    Thread.Sleep(delayBetweenRetries);
+    Thread.Sleep(1000); // Wait 1 second before retrying
 }
 
-if (certsFound)
+// Read and configure the certificates
+var cert = X509Certificate2.CreateFromPem(
+    await File.ReadAllTextAsync(certPath).ConfigureAwait(false),
+    await File.ReadAllTextAsync(keyPath).ConfigureAwait(false)
+);
+
+// Re-export the certificate if necessary
+cert = new X509Certificate2(cert.Export(X509ContentType.Pfx));
+
+// Configure Kestrel to use the certificate
+builder.WebHost.ConfigureKestrel(options =>
 {
-    // Use CreateFromPem with ReadOnlySpan<char>
-    var cert = X509Certificate2.CreateFromPem(certPem.AsSpan(), keyPem.AsSpan());
+    options.ListenAnyIP(443, listenOptions => listenOptions.UseHttps(cert));
+});
 
-    // Optional: Re-export if necessary
-    cert = new X509Certificate2(cert.Export(X509ContentType.Pfx));
-
-    // Configure Kestrel to use the certificate
-    builder.WebHost.ConfigureKestrel(options =>
-    {
-        options.ListenAnyIP(443, listenOptions =>
-        {
-            listenOptions.UseHttps(cert);
-        });
-    });
-}
 
 var app = builder.Build();
 
