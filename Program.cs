@@ -73,7 +73,6 @@ for (int attempt = 1; attempt <= maxRetries; attempt++)
     if (attempt == maxRetries)
     {
         Console.WriteLine("Certificate files not found after multiple attempts. Exiting...");
-        throw new FileNotFoundException("Could not find certificate files", certPath);
     }
 
     Console.WriteLine($"Attempt {attempt}/{maxRetries}: Waiting for certificate files to be found...");
