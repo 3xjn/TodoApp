@@ -81,8 +81,6 @@ jobs:
             
             echo "Running Docker Compose..."
             export IMAGE_TAG=${{ env.IMAGE_TAG }}
-            export CERT_PEM='${{ env.CERT_PEM }}'
-            export KEY_PEM='${{ env.KEY_PEM }}'
             export MONGO_CONNECTION_STRING='${{ env.MONGO_CONNECTION_STRING }}'
             export MONGO_DATABASE_NAME='${{ env.MONGO_DATABASE_NAME }}'
             export MONGO_COLLECTION_NAME='${{ env.MONGO_COLLECTION_NAME }}'
