@@ -49,12 +49,13 @@ jobs:
             set -e
             echo "Starting deployment process..."
             
-            echo "Stopping existing container..."
+            # Stop and remove the existing container
+            echo "Stopping existing container if it exists..."
             if [ "$(sudo docker ps -q -f name=todo-app)" ]; then
               sudo docker stop todo-app
               sudo docker rm todo-app
             fi
-            
+      
             echo "Loading Docker image..."
             if [ -f /home/${{ secrets.DROPLET_USERNAME }}/image.tar ]; then
               sudo docker load -i /home/${{ secrets.DROPLET_USERNAME }}/image.tar
