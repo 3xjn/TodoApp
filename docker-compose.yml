@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  todo-app:
+    image: ${IMAGE_TAG}
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      CERT_PEM: ${CERT_PEM}
+      KEY_PEM: ${KEY_PEM}
+      MONGO__ConnectionString: ${MONGO_CONNECTION_STRING}
+      MONGO__DatabaseName: ${MONGO_DATABASE_NAME}
+      MONGO__CollectionName: ${MONGO_COLLECTION_NAME}
+    volumes:
+      - /etc/letsencrypt/live/3xjn.dev/fullchain.pem:/etc/letsencrypt/live/3xjn.dev/fullchain.pem:ro
+      - /etc/letsencrypt/live/3xjn.dev/privkey.pem:/etc/letsencrypt/live/3xjn.dev/privkey.pem:ro
