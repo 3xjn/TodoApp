@@ -92,7 +92,7 @@ jobs:
             export IMAGE_TAG=${{ env.IMAGE_TAG }}
 
             # Set environment variables for sensitive data
-            export CERT_PFX="/path/inside/container/mycert.pfx"
+            export CERT_PFX="/home/${{ secrets.DROPLET_USERNAME }}/mycert.pfx"
             export CERT_PFX_PASS="\$CERT_PFX_PASS"
             export MONGO_CONNECTION_STRING="\$MONGO_CONNECTION_STRING"
             export MONGO_DATABASE_NAME="\$MONGO_DATABASE_NAME"
