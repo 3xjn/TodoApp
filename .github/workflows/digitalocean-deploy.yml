@@ -76,8 +76,7 @@ jobs:
             
             echo "Running Docker Compose..."
             export IMAGE_TAG=${{ env.IMAGE_TAG }}
-            export CERT_PEM=\$(sudo cat /etc/letsencrypt/live/3xjn.dev/fullchain.pem)
-            export KEY_PEM=\$(sudo cat /etc/letsencrypt/live/3xjn.dev/privkey.pem)
+            export CERT_PFX=\$(sudo cat /home/${{ secrets.DROPLET_USERNAME }}/mycert.pfx)
             
             # Export MongoDB environment variables
             export MONGO_CONNECTION_STRING="${{ secrets.MONGO_CONNECTION_STRING }}"
