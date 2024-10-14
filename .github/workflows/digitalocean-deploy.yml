@@ -60,11 +60,14 @@ jobs:
             sudo docker images
       
             echo "Running Docker container..."
-            sudo docker run -d --name my-container \
+            sudo docker run -d --name todo-app \
               -p 443:443 -p 80:80 \
               -v /etc/letsencrypt/live/3xjn.dev:/app/certs \
               --env CERT_PATH="/app/certs/fullchain.pem" \
               --env KEY_PATH="/app/certs/privkey.pem" \
+              --env MONGO__ConnectionString="${{ secrets.MONGO_CONNECTION_STRING }}" \
+              --env MONGO__DatabaseName="${{ secrets.MONGO_DATABASE_NAME }}" \
+              --env MONGO__CollectionName="${{ secrets.MONGO_COLLECTION_NAME }}" \
               ${{ env.IMAGE_TAG }}
             
             echo "Deployment completed successfully!"
