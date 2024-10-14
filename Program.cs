@@ -57,14 +57,17 @@ if (string.IsNullOrEmpty(certPem) || string.IsNullOrEmpty(keyPem))
     throw new InvalidOperationException("Certificate and key must be provided.");
 }
 
-var cert = X509Certificate2.CreateFromPem(certPem.AsSpan(), keyPem.AsSpan());
+// Create the certificate from the PEM strings
+var cert = X509Certificate2.CreateFromPem(certPem, keyPem);
+
+// Re-export the certificate if necessary
+cert = new X509Certificate2(cert.Export(X509ContentType.Pfx));
 
 // Configure Kestrel to use the certificate
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(443, listenOptions => listenOptions.UseHttps(cert));
 });
-
 
 var app = builder.Build();
 
