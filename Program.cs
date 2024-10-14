@@ -1,3 +1,4 @@
+using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using LettuceEncrypt;
 using Microsoft.Extensions.FileProviders;
@@ -55,21 +56,20 @@ builder.Services.AddSwaggerGen();
 var certPath = "/etc/letsencrypt/live/3xjn.dev/fullchain.pem";
 var keyPath = "/etc/letsencrypt/live/3xjn.dev/privkey.pem";
 
-builder.WebHost.ConfigureKestrel(serverOptions =>
+// Load the certificates from PEM files
+var cert = X509Certificate2.CreateFromPemFile(
+    certPath,
+    keyPath);
+
+// Optional: If needed, re-export to ensure compatibility
+cert = new X509Certificate2(cert.Export(X509ContentType.Pfx));
+
+// Configure Kestrel to use the certificate
+builder.WebHost.ConfigureKestrel(options =>
 {
-    serverOptions.ListenAnyIP(80);
-    serverOptions.ListenAnyIP(443, listenOptions =>
+    options.ListenAnyIP(443, listenOptions =>
     {
-        try
-        {
-            listenOptions.UseHttps(certPath, keyPath);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error configuring HTTPS: {ex.Message}");
-            // Fallback to HTTP if HTTPS configuration fails
-            serverOptions.ListenAnyIP(80);
-        }
+        listenOptions.UseHttps(cert);
     });
 });
 
