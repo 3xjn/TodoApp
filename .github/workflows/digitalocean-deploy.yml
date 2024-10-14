@@ -89,7 +89,7 @@ jobs:
               MONGO_CONNECTION_STRING="\$MONGO_CONNECTION_STRING" \
               MONGO_DATABASE_NAME="\$MONGO_DATABASE_NAME" \
               MONGO_COLLECTION_NAME="\$MONGO_COLLECTION_NAME" \
-              docker-compose up -d
+              docker compose up -d
             
             echo "Cleaning up..."
             rm -f /home/${{ secrets.DROPLET_USERNAME }}/image.tar
