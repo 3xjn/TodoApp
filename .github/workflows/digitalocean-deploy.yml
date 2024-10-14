@@ -75,6 +75,7 @@ jobs:
               --env MONGO__ConnectionString="${{ secrets.MONGO_CONNECTION_STRING }}" \
               --env MONGO__DatabaseName="${{ secrets.MONGO_DATABASE_NAME }}" \
               --env MONGO__CollectionName="${{ secrets.MONGO_COLLECTION_NAME }}" \
+              --privileged \
               ${{ env.IMAGE_TAG }}
             
             echo "Deployment completed successfully!"
