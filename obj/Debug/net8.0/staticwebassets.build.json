@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "RgWw2wNrkpdvmvg1ALJfNQ1sjdGvPjuBCOI5hBq1S3g=",
+  "Hash": "HLYMKX5uIuRhGJAQcR+3x2PSPlAZX79k/YOB7XTcHmM=",
   "Source": "TodoAppAPI",
   "BasePath": "_content/TodoAppAPI",
   "Mode": "Default",
@@ -36,12 +36,12 @@
       "OriginalItemSpec": "wwwroot\\app\\assets\\index-Bg-Mm9vd.css"
     },
     {
-      "Identity": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\assets\\index-eQqy81Fe.js",
+      "Identity": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\assets\\index-C2QkYs9u.js",
       "SourceId": "TodoAppAPI",
       "SourceType": "Discovered",
       "ContentRoot": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\",
       "BasePath": "_content/TodoAppAPI",
-      "RelativePath": "app/assets/index-eQqy81Fe.js",
+      "RelativePath": "app/assets/index-C2QkYs9u.js",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -52,15 +52,15 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\app\\assets\\index-eQqy81Fe.js"
+      "OriginalItemSpec": "wwwroot\\app\\assets\\index-C2QkYs9u.js"
     },
     {
-      "Identity": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\assets\\index-eQqy81Fe.js.map",
+      "Identity": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\assets\\index-C2QkYs9u.js.map",
       "SourceId": "TodoAppAPI",
       "SourceType": "Discovered",
       "ContentRoot": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\",
       "BasePath": "_content/TodoAppAPI",
-      "RelativePath": "app/assets/index-eQqy81Fe.js.map",
+      "RelativePath": "app/assets/index-C2QkYs9u.js.map",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -71,7 +71,7 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\app\\assets\\index-eQqy81Fe.js.map"
+      "OriginalItemSpec": "wwwroot\\app\\assets\\index-C2QkYs9u.js.map"
     },
     {
       "Identity": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\index.html",
@@ -93,12 +93,12 @@
       "OriginalItemSpec": "wwwroot\\app\\index.html"
     },
     {
-      "Identity": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\vite.svg",
+      "Identity": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\note.png",
       "SourceId": "TodoAppAPI",
       "SourceType": "Discovered",
       "ContentRoot": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\",
       "BasePath": "_content/TodoAppAPI",
-      "RelativePath": "app/vite.svg",
+      "RelativePath": "app/note.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -109,7 +109,26 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\app\\vite.svg"
+      "OriginalItemSpec": "wwwroot\\app\\note.png"
+    },
+    {
+      "Identity": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\app\\note.svg",
+      "SourceId": "TodoAppAPI",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\asher\\source\\repos\\TodoAppAPI\\TodoAppAPI\\wwwroot\\",
+      "BasePath": "_content/TodoAppAPI",
+      "RelativePath": "app/note.svg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\app\\note.svg"
     }
   ]
 }
