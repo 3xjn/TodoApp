@@ -49,20 +49,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var certPem = Environment.GetEnvironmentVariable("CERT_PEM");
-var keyPem = Environment.GetEnvironmentVariable("KEY_PEM");
+// Get the PFX file path from the environment variable
+var certPfxPath = Environment.GetEnvironmentVariable("CERT_PFX");
+var certPfxPass = Environment.GetEnvironmentVariable("CERT_PFX_PASS");
 
-if (string.IsNullOrEmpty(certPem) || string.IsNullOrEmpty(keyPem))
+if (string.IsNullOrEmpty(certPfxPath))
 {
-    throw new InvalidOperationException("Certificate and key must be provided.");
+    throw new InvalidOperationException("Certificate path must be provided.");
 }
 
-// Debug logs
-Console.WriteLine($"CERT_PEM: {certPem}");
-Console.WriteLine($"KEY_PEM: {keyPem}");
-
-// Create the certificate from the PEM strings
-var cert = X509Certificate2.CreateFromPem(certPem, keyPem);
+// Load the PFX certificate
+var cert = new X509Certificate2(certPfxPath, certPfxPass);
 
 // Configure Kestrel to use the certificate
 builder.WebHost.ConfigureKestrel(options =>
