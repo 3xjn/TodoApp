@@ -49,37 +49,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var certPath = "/home/letsencrypt/live/3xjn.dev/fullchain.pem";
-var keyPath = "/home/letsencrypt/live/3xjn.dev/privkey.pem";
-string certPem = string.Empty;
-string keyPem = string.Empty;
+var certPem = Environment.GetEnvironmentVariable("CERT_PEM");
+var keyPem = Environment.GetEnvironmentVariable("KEY_PEM");
 
-// Wait for certificate files with a maximum retry mechanism
-for (int attempt = 1; attempt <= 30; attempt++)
+if (string.IsNullOrEmpty(certPem) || string.IsNullOrEmpty(keyPem))
 {
-    if (File.Exists(certPath) && File.Exists(keyPath))
-    {
-        Console.WriteLine("Certificates found.");
-
-        // Read the certificate and key as strings
-        certPem = await File.ReadAllTextAsync(certPath).ConfigureAwait(false);
-        keyPem = await File.ReadAllTextAsync(keyPath).ConfigureAwait(false);
-        break;
-    }
-
-    if (attempt == 30)
-    {
-        throw new FileNotFoundException("Certificate files not found after multiple attempts.");
-    }
-
-    Thread.Sleep(1000); // Wait 1 second before retrying
+    throw new InvalidOperationException("Certificate and key must be provided.");
 }
 
-// Create the certificate from PEM strings
 var cert = X509Certificate2.CreateFromPem(certPem.AsSpan(), keyPem.AsSpan());
-
-// Re-export the certificate if necessary
-cert = new X509Certificate2(cert.Export(X509ContentType.Pfx));
 
 // Configure Kestrel to use the certificate
 builder.WebHost.ConfigureKestrel(options =>
