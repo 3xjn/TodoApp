@@ -49,8 +49,9 @@ jobs:
             sudo docker rm my-container || echo "No container to remove"
             echo "Creating certificate directory in container..."
             sudo docker create --name temp-container ${{ env.IMAGE_TAG }}
-            sudo docker cp /etc/letsencrypt/live/3xjn.dev/fullchain.pem temp-container:/app/fullchain.pem
-            sudo docker cp /etc/letsencrypt/live/3xjn.dev/privkey.pem temp-container:/app/privkey.pem
+            # Copy the actual certificate files, not the symlinks
+            sudo docker cp \$(readlink -f /etc/letsencrypt/live/3xjn.dev/fullchain.pem) temp-container:/app/fullchain.pem
+            sudo docker cp \$(readlink -f /etc/letsencrypt/live/3xjn.dev/privkey.pem) temp-container:/app/privkey.pem
             sudo docker commit temp-container ${{ env.IMAGE_TAG }}
             sudo docker rm temp-container
             echo "Running Docker container..."
