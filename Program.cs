@@ -55,6 +55,9 @@ builder.Services.AddSwaggerGen();
 var certPath = Environment.GetEnvironmentVariable("CERT_PATH") ?? "/app/fullchain.pem";
 var keyPath = Environment.GetEnvironmentVariable("KEY_PATH") ?? "/app/privkey.pem";
 
+Console.Write($"certPath {certPath}");
+Console.Write($"keyPath {keyPath}");
+
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.ListenAnyIP(80);
