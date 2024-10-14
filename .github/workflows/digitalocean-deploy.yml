@@ -72,12 +72,16 @@ jobs:
       
             echo "Loaded Docker images:"
             sudo docker images
-      
+
+            # Read certificate and key into variables
+            CERT_PEM=\$(sudo cat /etc/letsencrypt/live/3xjn.dev/fullchain.pem)
+            KEY_PEM=\$(sudo cat /etc/letsencrypt/live/3xjn.dev/privkey.pem)
+
             echo "Running Docker container..."
             sudo docker run -d \
               -p 443:443 -p 80:80 \
-              --env CERT_PEM="$(sudo cat /etc/letsencrypt/live/3xjn.dev/fullchain.pem)" \
-              --env KEY_PEM="$(sudo cat /etc/letsencrypt/live/3xjn.dev/privkey.pem)" \
+              --env CERT_PEM="\$CERT_PEM" \
+              --env KEY_PEM="\$KEY_PEM" \
               --env MONGO__ConnectionString="${{ secrets.MONGO_CONNECTION_STRING }}" \
               --env MONGO__DatabaseName="${{ secrets.MONGO_DATABASE_NAME }}" \
               --env MONGO__CollectionName="${{ secrets.MONGO_COLLECTION_NAME }}" \
@@ -86,3 +90,4 @@ jobs:
             
             echo "Deployment completed successfully!"
           EOF
+
