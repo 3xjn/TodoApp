@@ -1,10 +1,15 @@
 name: Build and Push Docker Image to DigitalOcean Droplet
+
 on:
   push:
-    branches: [master, main]
+    branches:
+      - master
+      - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -14,7 +19,7 @@ jobs:
         with:
           path: |
             /tmp/.docker-cache
-          key: ${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile', '**/*.py', '**/*.js') }}
+          key: "${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile', '**/*.csproj') }}"
           restore-keys: |
             ${{ runner.os }}-docker-
       - name: Set up Docker Image Tag
@@ -39,60 +44,35 @@ jobs:
         run: |
           scp -i ~/.ssh/id_rsa image.tar ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }}:/home/${{ secrets.DROPLET_USERNAME }}/image.tar
       - name: SSH into Droplet and Deploy using Docker
-        run: |
+        run: |-
           ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=10 -i ~/.ssh/id_rsa ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }} << EOF
             set -e
             echo "Starting deployment process..."
-            
+
             echo "Loading Docker image..."
             if [ -f /home/${{ secrets.DROPLET_USERNAME }}/image.tar ]; then
-              sudo docker load -i /home/${{ secrets.DROPLET_USERNAME }}/image.tar
+              sudo docker load -i /home/${{ secrets.DROPLET_USERNAME }}/image.tar || { echo "Failed to load Docker image"; exit 1; }
             else
               echo "image.tar not found, skipping load step"
             fi
-            
-            echo "Stopping and removing any existing containers..."
-            sudo docker stop my-container || echo "No my-container to stop"
-            sudo docker rm my-container || echo "No my-container to remove"
-            sudo docker stop temp-container || echo "No temp-container to stop"
-            sudo docker rm temp-container || echo "No temp-container to remove"
-            
-            echo "Creating certificate directory in container..."
-            sudo docker create --name temp-container ${{ env.IMAGE_TAG }}
-            
-            echo "Copying SSL certificates..."
-            sudo docker cp \$(readlink -f /etc/letsencrypt/live/3xjn.dev/fullchain.pem) temp-container:/app/fullchain.pem
-            sudo docker cp \$(readlink -f /etc/letsencrypt/live/3xjn.dev/privkey.pem) temp-container:/app/privkey.pem
-            
-            echo "Committing changes to image..."
-            sudo docker commit temp-container ${{ env.IMAGE_TAG }}
-            
-            echo "Removing temporary container..."
-            sudo docker rm temp-container
-            
+
+            echo "Stopping and removing existing containers..."
+            for container in my-container temp-container; do
+              if sudo docker ps -a | grep -q "\$container"; then
+                sudo docker stop \$container || echo "No \$container to stop"
+                sudo docker rm \$container || echo "No \$container to remove"
+              fi
+            done
+
             echo "Running Docker container..."
             sudo docker run -d --name my-container \
               -p 443:443 -p 80:80 \
-              -v /var/www/html/.well-known/:/app/wwwroot/.well-known/ \
               --env MONGO__ConnectionString="${{ secrets.MONGO_CONNECTION_STRING }}" \
               --env MONGO__DatabaseName="${{ secrets.MONGO_DATABASE_NAME }}" \
               --env MONGO__CollectionName="${{ secrets.MONGO_COLLECTION_NAME }}" \
               --env CERT_PATH="/app/fullchain.pem" \
               --env KEY_PATH="/app/privkey.pem" \
-              ${{ env.IMAGE_TAG }}
-            
-            echo "Cleaning up..."
-            if [ -f /home/${{ secrets.DROPLET_USERNAME }}/image.tar ]; then
-              rm /home/${{ secrets.DROPLET_USERNAME }}/image.tar
-            else
-              echo "image.tar not found, skipping cleanup"
-            fi
-            
-            echo "Checking container status..."
-            sudo docker ps -a
-            
-            echo "Checking container logs..."
-            sudo docker logs my-container
-            
+              ${{ env.IMAGE_TAG }} || { echo "Failed to run Docker container"; exit 1; }
+
             echo "Deployment completed successfully!"
           EOF
