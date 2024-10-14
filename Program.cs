@@ -74,7 +74,7 @@ for (int attempt = 1; attempt <= maxRetries; attempt++)
     }
 
     Console.WriteLine($"Attempt {attempt}/{maxRetries}: Waiting for certificate files to be found...");
-    await Task.Sleep(delayBetweenRetries); // Wait for 1 second
+    Thread.Sleep(delayBetweenRetries); // Wait for 1 second
 }
 
 // Load the certificates from PEM files only if they were found
@@ -94,7 +94,6 @@ if (certsFound)
         });
     });
 }
-
 
 var app = builder.Build();
 
