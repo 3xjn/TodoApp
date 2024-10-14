@@ -52,11 +52,27 @@ builder.Services.AddSwaggerGen();
 var certPath = "/etc/letsencrypt/live/3xjn.dev/fullchain.pem";
 var keyPath = "/etc/letsencrypt/live/3xjn.dev/privkey.pem";
 
+// Verify the certificate directory and its files
+Console.WriteLine("Checking certificate directory...");
+var certsFolder = Path.GetDirectoryName(certPath);
+if (!string.IsNullOrEmpty(certsFolder))
+{
+    var certFiles = Directory.GetFiles(certsFolder);
+    Console.WriteLine($"Found files in {certsFolder}:");
+    foreach (var file in certFiles)
+    {
+        Console.WriteLine(file);
+    }
+}
+else
+{
+    Console.WriteLine($"Certificate folder path is invalid: {certsFolder}");
+}
+
 // Wait until the certificate files are found
 const int maxRetries = 30; // Max attempts to find the certificate files
 const int delayBetweenRetries = 1000; // 1 second delay between attempts
 bool certsFound = false;
-
 
 for (int attempt = 1; attempt <= maxRetries; attempt++)
 {
@@ -80,7 +96,7 @@ for (int attempt = 1; attempt <= maxRetries; attempt++)
 // Load the certificates from PEM files only if they were found
 if (certsFound)
 {
-    var cert = X509Certificate2.CreateFromPemFile(certPath, keyPath);
+    var cert = X509Certificate2.CreateFromPemFile(certPath, keyPath, X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.Exportable);
 
     // Optional: If needed, re-export to ensure compatibility
     cert = new X509Certificate2(cert.Export(X509ContentType.Pfx));
@@ -132,30 +148,5 @@ app.Use(async (context, next) => {
 });
 
 app.MapControllers();
-
-app.MapFallback(async context =>
-{
-    var path = context.Request.Path.Value;
-
-    if (string.IsNullOrEmpty(path)) return;
-
-    var code = path.TrimStart('/');
-
-    if (Regex.IsMatch(code, "^[a-z0-9]{6}$"))
-    {
-        context.Response.Redirect($"/redirect/{code}");
-    }
-    else
-    {
-        var env = app.Services.GetRequiredService<IWebHostEnvironment>();
-        var indexPath = Path.Combine(env.WebRootPath, "app", "index.html");
-
-        if (File.Exists(indexPath))
-        {
-            context.Response.ContentType = "text/html";
-            await context.Response.SendFileAsync(indexPath);
-        }
-    }
-});
 
 app.Run();
