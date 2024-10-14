@@ -69,7 +69,7 @@ jobs:
             echo "Running Docker container..."
             sudo docker run -d \
               -p 443:443 -p 80:80 \
-              -v /etc/letsencrypt/live/3xjn.dev:/etc/letsencrypt/live/3xjn.dev \
+              -v /etc/letsencrypt/live/3xjn.dev:/home/letsencrypt/live/3xjn.dev \
               --env CERT_PATH="/etc/letsencrypt/live/3xjn.dev/fullchain.pem" \
               --env KEY_PATH="/etc/letsencrypt/live/3xjn.dev/privkey.pem" \
               --env MONGO__ConnectionString="${{ secrets.MONGO_CONNECTION_STRING }}" \
