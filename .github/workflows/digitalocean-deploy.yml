@@ -18,39 +18,45 @@ jobs:
         id: docker-cache
         uses: actions/cache@v3
         with:
-          path: |
-            /tmp/.docker-cache
+          path: /tmp/.docker-cache
           key: "${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile', '**/*.csproj') }}"
           restore-keys: |
             ${{ runner.os }}-docker-
+
       - name: Set up Docker Image Tag
         run: |
           echo "IMAGE_TAG=todoapp:$(date +%s)-${GITHUB_SHA::8}" >> $GITHUB_ENV
-      - name: Build Docker image
+
+      - name: Build Docker Image
         run: |
-          docker build --cache-from=type=local,src=/tmp/.docker-cache -t "${{ env.IMAGE_TAG }}" .
-          echo "Docker image built successfully:"
-          docker image ls --format "{{.Repository}}:{{.Tag}}" | grep "todoapp" || echo "Warning: Image not found in list, but build completed"
+          echo "Running Docker Compose..."
+          export IMAGE_TAG=${{ env.IMAGE_TAG }}
+          
+          # Copy the PFX file to the Docker build context
+          cp /home/${{ secrets.DROPLET_USERNAME }}/mycert.pfx .
+
+          # Build the Docker image (without sensitive info)
+          docker compose build
+
       - name: Save Docker image to a tar file
         run: |
           docker save ${{ env.IMAGE_TAG }} -o image.tar
           ls -lh image.tar
+
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
+
       - name: Transfer docker image and docker-compose.yml
         run: |
           scp -i ~/.ssh/id_rsa image.tar ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }}:/home/${{ secrets.DROPLET_USERNAME }}/image.tar
 
       - name: Set Environment Variables
         run: |
-          echo "CERT_PFX=$(base64 /home/${{ secrets.DROPLET_USERNAME }}/mycert.pfx)" >> $GITHUB_ENV
           echo "CERT_PFX_PASS=$(cat /home/${{ secrets.DROPLET_USERNAME }}/certpass.txt)" >> $GITHUB_ENV
-
-          # MongoDB environment variables
           echo "MONGO_CONNECTION_STRING=${{ secrets.MONGO_CONNECTION_STRING }}" >> $GITHUB_ENV
           echo "MONGO_DATABASE_NAME=${{ secrets.MONGO_DATABASE_NAME }}" >> $GITHUB_ENV
           echo "MONGO_COLLECTION_NAME=${{ secrets.MONGO_COLLECTION_NAME }}" >> $GITHUB_ENV
@@ -61,7 +67,6 @@ jobs:
             set -e
             echo "Starting deployment process..."
             
-            # Change to the directory where docker-compose.yml is located
             cd /home/${{ secrets.DROPLET_USERNAME }}
             echo "Current Directory: \$(pwd)"
             echo "Contents of the Directory:"
@@ -85,13 +90,16 @@ jobs:
             
             echo "Running Docker Compose..."
             export IMAGE_TAG=${{ env.IMAGE_TAG }}
-            
-            # Run the Docker Compose command
-            sudo IMAGE_TAG=\$IMAGE_TAG CERT_PEM="\$CERT_PEM" KEY_PEM="\$KEY_PEM" \
-              MONGO_CONNECTION_STRING="\$MONGO_CONNECTION_STRING" \
-              MONGO_DATABASE_NAME="\$MONGO_DATABASE_NAME" \
-              MONGO_COLLECTION_NAME="\$MONGO_COLLECTION_NAME" \
-              docker compose up -d
+
+            # Set environment variables for sensitive data
+            export CERT_PFX="/path/inside/container/mycert.pfx"
+            export CERT_PFX_PASS="\$CERT_PFX_PASS"
+            export MONGO_CONNECTION_STRING="\$MONGO_CONNECTION_STRING"
+            export MONGO_DATABASE_NAME="\$MONGO_DATABASE_NAME"
+            export MONGO_COLLECTION_NAME="\$MONGO_COLLECTION_NAME"
+
+            # Run the Docker Compose command with sensitive data
+            sudo docker compose up -d
             
             echo "Cleaning up..."
             rm -f /home/${{ secrets.DROPLET_USERNAME }}/image.tar
