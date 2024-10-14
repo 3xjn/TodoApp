@@ -1,83 +1,29 @@
-name: Build and Push Docker Image to DigitalOcean Droplet
-
-on:
-  push:
-    branches:
-      - master
-      - main
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        
-      - name: Cache Docker layers
-        id: docker-cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            /tmp/.docker-cache
-          key: "${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile', '**/*.csproj') }}"
-          restore-keys: |
-            ${{ runner.os }}-docker-
-            
-      - name: Set up Docker Image Tag
-        run: |
-          echo "IMAGE_TAG=todoapp:$(date +%s)-${GITHUB_SHA::8}" >> $GITHUB_ENV
-          
-      - name: Build Docker image
-        run: |
-          docker build --cache-from=type=local,src=/tmp/.docker-cache -t "${{ env.IMAGE_TAG }}" .
-          echo "Docker image built successfully:"
-          docker image ls --format "{{.Repository}}:{{.Tag}}" | grep "todoapp" || echo "Warning: Image not found in list, but build completed"
-          
-      - name: Save Docker image to a tar file
-        run: |
-          docker save ${{ env.IMAGE_TAG }} -o image.tar
-          ls -lh image.tar
-          
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
-          
-      - name: Transfer docker image
-        run: |
-          scp -i ~/.ssh/id_rsa image.tar ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }}:/home/${{ secrets.DROPLET_USERNAME }}/todoapp/image.tar
-          
-      - name: SSH into Droplet and Deploy using Docker Compose
-        run: |
-          ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=10 -i ~/.ssh/id_rsa ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }} << EOF
-            set -e
-            echo "Starting deployment process..."
-            
-            # Navigate to the app directory
-            cd ~/todoapp
-            
-            # Stop the running services if any
-            echo "Stopping existing services..."
-            sudo docker-compose down || true
-            
-            # Load the new image if the tar file exists
-            if [ -f image.tar ]; then
-              echo "Loading new Docker image..."
-              sudo docker load -i image.tar
-              rm image.tar
-            fi
-            
-            # Export environment variables from GitHub secrets
-            export MONGO_CONNECTION_STRING="${{ secrets.MONGO_CONNECTION_STRING }}"
-            export MONGO_DATABASE_NAME="${{ secrets.MONGO_DATABASE_NAME }}"
-            export MONGO_COLLECTION_NAME="${{ secrets.MONGO_COLLECTION_NAME }}"
-
-            # Start the updated services using Docker Compose
-            echo "Starting services with Docker Compose..."
-            sudo docker-compose up -d --build
-            
-            echo "Deployment completed successfully!"
-          EOF
+- name: SSH into Droplet and Deploy using Docker Compose
+     run: |
+       ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=10 -i ~/.ssh/id_rsa ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }} << EOF
+         set -e
+         echo "Starting deployment process..."
+         
+         # Navigate to the app directory
+         cd ~/todoapp
+         
+         # Stop the running services if any
+         echo "Stopping existing services..."
+         sudo docker-compose down || true
+         
+         # Load the new image if the tar file exists
+         if [ -f image.tar ]; then
+           echo "Loading new Docker image..."
+           sudo docker load -i image.tar
+           rm image.tar
+         fi
+         
+         # Start the updated services using Docker Compose with env vars
+         echo "Starting services with Docker Compose..."
+         MONGO_CONNECTION_STRING="${{ secrets.MONGO_CONNECTION_STRING }}" \
+         MONGO_DATABASE_NAME="${{ secrets.MONGO_DATABASE_NAME }}" \
+         MONGO_COLLECTION_NAME="${{ secrets.MONGO_COLLECTION_NAME }}" \
+         sudo docker-compose up -d --build
+         
+         echo "Deployment completed successfully!"
+       EOF
