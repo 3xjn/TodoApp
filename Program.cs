@@ -58,23 +58,23 @@ var keyPath = Environment.GetEnvironmentVariable("KEY_PATH") ?? "/app/privkey.pe
 Console.Write($"certPath {certPath}");
 Console.Write($"keyPath {keyPath}");
 
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    serverOptions.ListenAnyIP(80);
-    serverOptions.ListenAnyIP(443, listenOptions =>
-    {
-        try
-        {
-            listenOptions.UseHttps(certPath, keyPath);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error configuring HTTPS: {ex.Message}");
-            // Fallback to HTTP if HTTPS configuration fails
-            serverOptions.ListenAnyIP(80);
-        }
-    });
-});
+//builder.WebHost.ConfigureKestrel(serverOptions =>
+//{
+//    serverOptions.ListenAnyIP(80);
+//    serverOptions.ListenAnyIP(443, listenOptions =>
+//    {
+//        try
+//        {
+//            listenOptions.UseHttps(certPath, keyPath);
+//        }
+//        catch (Exception ex)
+//        {
+//            Console.WriteLine($"Error configuring HTTPS: {ex.Message}");
+//            // Fallback to HTTP if HTTPS configuration fails
+//            serverOptions.ListenAnyIP(80);
+//        }
+//    });
+//});
 
 var app = builder.Build();
 
