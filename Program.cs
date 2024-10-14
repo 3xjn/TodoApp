@@ -51,7 +51,16 @@ builder.Services.AddScoped<TodoService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddLettuceEncrypt();
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(80); // Optional HTTP for redirection or Certbot renewals
+    serverOptions.ListenAnyIP(443, listenOptions =>
+    {
+        listenOptions.UseHttps("/etc/letsencrypt/live/3xjn.dev/fullchain.pem",
+                               "/etc/letsencrypt/live/3xjn.dev/privkey.pem");
+    });
+});
 
 var app = builder.Build();
 
@@ -76,6 +85,8 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.UseCors("AllowAll");
+
+app.UseHttpsRedirection();
 
 app.MapControllers();
 

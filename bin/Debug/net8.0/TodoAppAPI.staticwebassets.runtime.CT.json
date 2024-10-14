@@ -6,12 +6,34 @@
     "Children": {
       "app": {
         "Children": {
-          "index.css": {
-            "Children": null,
-            "Asset": {
-              "ContentRootIndex": 0,
-              "SubPath": "app/index.css"
+          "assets": {
+            "Children": {
+              "index-Bg-Mm9vd.css": {
+                "Children": null,
+                "Asset": {
+                  "ContentRootIndex": 0,
+                  "SubPath": "app/assets/index-Bg-Mm9vd.css"
+                },
+                "Patterns": null
+              },
+              "index-C2QkYs9u.js": {
+                "Children": null,
+                "Asset": {
+                  "ContentRootIndex": 0,
+                  "SubPath": "app/assets/index-C2QkYs9u.js"
+                },
+                "Patterns": null
+              },
+              "index-C2QkYs9u.js.map": {
+                "Children": null,
+                "Asset": {
+                  "ContentRootIndex": 0,
+                  "SubPath": "app/assets/index-C2QkYs9u.js.map"
+                },
+                "Patterns": null
+              }
             },
+            "Asset": null,
             "Patterns": null
           },
           "index.html": {
@@ -22,27 +44,19 @@
             },
             "Patterns": null
           },
-          "index.js": {
+          "note.png": {
             "Children": null,
             "Asset": {
               "ContentRootIndex": 0,
-              "SubPath": "app/index.js"
+              "SubPath": "app/note.png"
             },
             "Patterns": null
           },
-          "index.js.map": {
+          "note.svg": {
             "Children": null,
             "Asset": {
               "ContentRootIndex": 0,
-              "SubPath": "app/index.js.map"
-            },
-            "Patterns": null
-          },
-          "vite.svg": {
-            "Children": null,
-            "Asset": {
-              "ContentRootIndex": 0,
-              "SubPath": "app/vite.svg"
+              "SubPath": "app/note.svg"
             },
             "Patterns": null
           }
