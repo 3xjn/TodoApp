@@ -47,14 +47,21 @@ jobs:
             echo "Stopping and removing any existing container..."
             sudo docker stop my-container || echo "No container to stop"
             sudo docker rm my-container || echo "No container to remove"
+            echo "Creating certificate directory in container..."
+            sudo docker create --name temp-container ${{ env.IMAGE_TAG }}
+            sudo docker cp /etc/letsencrypt/live/3xjn.dev/fullchain.pem temp-container:/app/fullchain.pem
+            sudo docker cp /etc/letsencrypt/live/3xjn.dev/privkey.pem temp-container:/app/privkey.pem
+            sudo docker commit temp-container ${{ env.IMAGE_TAG }}
+            sudo docker rm temp-container
             echo "Running Docker container..."
             sudo docker run -d --name my-container \
               -p 443:443 -p 80:80 \
-              -v /etc/letsencrypt/live/3xjn.dev/:/app/certs/:ro \
               -v /var/www/html/.well-known/:/app/wwwroot/.well-known/ \
               --env MONGO__ConnectionString="${{ secrets.MONGO_CONNECTION_STRING }}" \
               --env MONGO__DatabaseName="${{ secrets.MONGO_DATABASE_NAME }}" \
               --env MONGO__CollectionName="${{ secrets.MONGO_COLLECTION_NAME }}" \
+              --env CERT_PATH="/app/fullchain.pem" \
+              --env KEY_PATH="/app/privkey.pem" \
               ${{ env.IMAGE_TAG }}
             echo "Cleaning up..."
             rm /home/${{ secrets.DROPLET_USERNAME }}/image.tar
