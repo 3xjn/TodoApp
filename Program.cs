@@ -52,11 +52,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var certPath = Environment.GetEnvironmentVariable("CERT_PATH") ?? "/app/fullchain.pem";
-var keyPath = Environment.GetEnvironmentVariable("KEY_PATH") ?? "/app/privkey.pem";
-
-Console.Write($"certPath {certPath}");
-Console.Write($"keyPath {keyPath}");
+var certPath = "/etc/letsencrypt/live/3xjn.dev/fullchain.pem";
+var keyPath = "/etc/letsencrypt/live/3xjn.dev/privkey.pem";
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
