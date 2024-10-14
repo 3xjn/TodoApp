@@ -57,15 +57,10 @@ const int maxRetries = 30; // Max attempts to find the certificate files
 const int delayBetweenRetries = 1000; // 1 second delay between attempts
 bool certsFound = false;
 
-// Method to check if certificate files exist
-bool CheckCertificateFilesExist(string certPath, string keyPath)
-{
-    return File.Exists(certPath) && File.Exists(keyPath);
-}
 
 for (int attempt = 1; attempt <= maxRetries; attempt++)
 {
-    if (CheckCertificateFilesExist(certPath, keyPath))
+    if (File.Exists(certPath) && File.Exists(keyPath))
     {
         Console.WriteLine("Certificate files found.");
         certsFound = true; // Set flag to true if files are found
