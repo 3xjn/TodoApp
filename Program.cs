@@ -49,8 +49,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-using System.Security.Cryptography.X509Certificates;
-
 // Read certificate and key from mounted files
 var certPem = System.IO.File.ReadAllText("/etc/letsencrypt/live/3xjn.dev/fullchain.pem");
 var keyPem = System.IO.File.ReadAllText("/etc/letsencrypt/live/3xjn.dev/privkey.pem");
