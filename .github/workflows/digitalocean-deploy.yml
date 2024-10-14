@@ -50,7 +50,7 @@ jobs:
             echo "Running Docker container..."
             sudo docker run -d --name my-container \
               -p 443:443 -p 80:80 \
-              -v /etc/letsencrypt/live/example.com/:/app/certs/:ro \
+              -v /etc/letsencrypt/live/3xjn.dev/:/app/certs/:ro \
               -v /var/www/html/.well-known/:/app/wwwroot/.well-known/ \
               --env MONGO__ConnectionString="${{ secrets.MONGO_CONNECTION_STRING }}" \
               --env MONGO__DatabaseName="${{ secrets.MONGO_DATABASE_NAME }}" \
