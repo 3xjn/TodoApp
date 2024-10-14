@@ -52,19 +52,25 @@ jobs:
             set -e
             echo "Starting deployment process..."
             
+            # Change to the directory where docker-compose.yml is located
+            cd /home/${{ secrets.DROPLET_USERNAME }}
+            echo "Current Directory: \$(pwd)"
+            echo "Contents of the Directory:"
+            ls -l
+
             # Stop and remove the existing container
             echo "Stopping existing container if it exists..."
             if [ "\$(sudo docker ps -q -f name=todo-app)" ]; then
               sudo docker-compose down
             fi
-      
+
             echo "Loading Docker image..."
             if [ -f /home/${{ secrets.DROPLET_USERNAME }}/image.tar ]; then
               sudo docker load -i /home/${{ secrets.DROPLET_USERNAME }}/image.tar
             else
               echo "image.tar not found, skipping load step"
             fi
-      
+
             echo "Loaded Docker images:"
             sudo docker images
 
@@ -72,8 +78,18 @@ jobs:
             export IMAGE_TAG=${{ env.IMAGE_TAG }}
             export CERT_PEM=\$(sudo cat /etc/letsencrypt/live/3xjn.dev/fullchain.pem)
             export KEY_PEM=\$(sudo cat /etc/letsencrypt/live/3xjn.dev/privkey.pem)
+            
+            # Export MongoDB environment variables
+            export MONGO_CONNECTION_STRING="${{ secrets.MONGO_CONNECTION_STRING }}"
+            export MONGO_DATABASE_NAME="${{ secrets.MONGO_DATABASE_NAME }}"
+            export MONGO_COLLECTION_NAME="${{ secrets.MONGO_COLLECTION_NAME }}"
 
-            sudo IMAGE_TAG=\$IMAGE_TAG CERT_PEM="\$CERT_PEM" KEY_PEM="\$KEY_PEM" sudo docker-compose up -d
+            # Run the Docker Compose command
+            sudo IMAGE_TAG=\$IMAGE_TAG CERT_PEM="\$CERT_PEM" KEY_PEM="\$KEY_PEM" \
+              MONGO_CONNECTION_STRING="\$MONGO_CONNECTION_STRING" \
+              MONGO_DATABASE_NAME="\$MONGO_DATABASE_NAME" \
+              MONGO_COLLECTION_NAME="\$MONGO_COLLECTION_NAME" \
+              sudo docker-compose up -d
             
             echo "Deployment completed successfully!"
           EOF
