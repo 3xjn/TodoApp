@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   todo-app:
     image: ${IMAGE_TAG}
@@ -7,11 +5,13 @@ services:
       - "80:80"
       - "443:443"
     environment:
-      CERT_PEM: ${CERT_PEM}
-      KEY_PEM: ${KEY_PEM}
-      MONGO__ConnectionString: ${MONGO_CONNECTION_STRING}
-      MONGO__DatabaseName: ${MONGO_DATABASE_NAME}
-      MONGO__CollectionName: ${MONGO_COLLECTION_NAME}
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/cert.pem
+      - ASPNETCORE_Kestrel__Certificates__Default__KeyPath=/app/key.pem
+      - Mongo__ConnectionString=${MONGO_CONNECTION_STRING}
+      - Mongo__DatabaseName=${MONGO_DATABASE_NAME}
+      - Mongo__CollectionName=${MONGO_COLLECTION_NAME}
     volumes:
-      - /etc/letsencrypt/live/3xjn.dev/fullchain.pem:/etc/letsencrypt/live/3xjn.dev/fullchain.pem:ro
-      - /etc/letsencrypt/live/3xjn.dev/privkey.pem:/etc/letsencrypt/live/3xjn.dev/privkey.pem:ro
+      - ${CERT_PEM}:/app/cert.pem:ro
+      - ${KEY_PEM}:/app/key.pem:ro
+    restart: unless-stopped
