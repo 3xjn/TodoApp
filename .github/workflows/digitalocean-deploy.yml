@@ -48,10 +48,16 @@ jobs:
           ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=10 -i ~/.ssh/id_rsa ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }} << EOF
             set -e
             echo "Starting deployment process..."
+            
+            echo "Loading Docker image..."
+            if [ -f /home/${{ secrets.DROPLET_USERNAME }}/image.tar ]; then
+              sudo docker load -i /home/${{ secrets.DROPLET_USERNAME }}/image.tar
+            else
+              echo "image.tar not found, skipping load step"
+            fi
       
-            echo "Stopping and removing existing containers..."
-            sudo docker stop my-container || echo "No my-container to stop"
-            sudo docker rm my-container || echo "No my-container to remove"
+            echo "Loaded Docker images:"
+            sudo docker images
       
             echo "Running Docker container..."
             sudo docker run -d --name my-container \
@@ -60,6 +66,6 @@ jobs:
               --env CERT_PATH="/app/certs/fullchain.pem" \
               --env KEY_PATH="/app/certs/privkey.pem" \
               ${{ env.IMAGE_TAG }}
-      
+            
             echo "Deployment completed successfully!"
           EOF
