@@ -49,8 +49,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var certPath = "/etc/letsencrypt/live/3xjn.dev/fullchain.pem";
-var keyPath = "/etc/letsencrypt/live/3xjn.dev/privkey.pem";
+var certPath = "/home/letsencrypt/live/3xjn.dev/fullchain.pem";
+var keyPath = "/home/letsencrypt/live/3xjn.dev/privkey.pem";
 string certPem = string.Empty;
 string keyPem = string.Empty;
 
