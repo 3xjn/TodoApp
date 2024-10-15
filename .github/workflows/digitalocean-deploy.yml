@@ -19,7 +19,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script_stop: true
           command_timeout: 200m
-          script: /
+          script:
             cd /home/root
             git pull
             cd ..
