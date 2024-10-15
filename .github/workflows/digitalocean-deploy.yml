@@ -1,4 +1,4 @@
-name: CI
+name: Build and Push Docker Image
 
 on:
   push:
@@ -6,22 +6,18 @@ on:
       - master
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
 
-  deploy:
-    runs-on: [ubuntu-latest]
     steps:
-      - uses: actions/checkout@v4
-      - name: Deploy APP
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.DROPLET_IP }}
-          username: ${{ secrets.DROPLET_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script_stop: true
-          command_timeout: 200m
-          script: |
-            cd /home/root/TodoApp
-            git pull
-            cd ..
-            docker-compose build --force-rom --no-cache --compress
-            docker-compose up -d
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build Docker image
+        run: docker build -t ghcr.io/${{ github.repository }}/my-container:latest .
+
+      - name: Push Docker image to GitHub Container Registry
+        run: docker push ghcr.io/${{ github.repository }}/my-container:latest
