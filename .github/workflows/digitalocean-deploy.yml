@@ -8,7 +8,6 @@ on:
 jobs:
 
   deploy:
-    if: github.ref == 'refs/head/main'
     runs-on: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v4
