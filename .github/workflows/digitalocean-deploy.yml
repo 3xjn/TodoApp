@@ -45,6 +45,5 @@ jobs:
             sudo docker run -d --name my-todo-app \
               -v /etc/letsencrypt/live/3xjn.dev/:/app/ \
               --user root \
-              --name docker \
               ghcr.io/${{ env.REPO_NAME }}/my-container:latest
           EOF
