@@ -17,7 +17,7 @@ jobs:
         run: echo "${{ secrets.PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build Docker image
-        run: docker build -t ghcr.io/${{ github.repository }}/my-container:latest .
+        run: docker build -t ghcr.io/${{ github.repository_owner }}/todoapp/my-container:latest .
 
       - name: Push Docker image to GitHub Container Registry
-        run: docker push ghcr.io/${{ github.repository }}/my-container:latest
+        run: docker push ghcr.io/${{ github.repository_owner }}/todoapp/my-container:latest
