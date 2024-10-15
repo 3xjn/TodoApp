@@ -36,6 +36,7 @@ builder.Services.Configure<TodoDatabaseSettings>(
 builder.Services.AddSingleton(serviceProvider =>
 {
     var settings = serviceProvider.GetRequiredService<IOptions<TodoDatabaseSettings>>().Value;
+    Console.WriteLine($"Connecting to with string of {settings.ConnectionString.Length} length");
     return new MongoClient(settings.ConnectionString);
 });
 
