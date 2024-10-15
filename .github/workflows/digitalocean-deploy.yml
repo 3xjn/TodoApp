@@ -43,7 +43,7 @@ jobs:
             docker stop my-todo-app || true && docker rm my-todo-app || true
             docker pull ghcr.io/${{ env.REPO_NAME }}/my-container:latest
             docker run -d --name my-todo-app \
-              -v /etc/letsencrypt/live/3xjn.dev/:/ \
+              -v /etc/letsencrypt/live/3xjn.dev/:/app \
               --user root \
               ghcr.io/${{ env.REPO_NAME }}/my-container:latest
           EOF
