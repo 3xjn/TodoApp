@@ -39,11 +39,10 @@ jobs:
       - name: SSH into Droplet and Deploy using Docker
         run: |
           ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=10 -i ~/.ssh/id_rsa ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }} << EOF
-            echo $GITHUB_PAT | docker login ghcr.io -u 3xjn --password-stdin
-            docker stop my-todo-app || true && docker rm my-todo-app || true
-            docker pull ghcr.io/${{ env.REPO_NAME }}/my-container:latest
-            docker run -d --name my-todo-app \
-              -v /etc/letsencrypt/live/3xjn.dev/:/app \
-              --user root \
-              ghcr.io/${{ env.REPO_NAME }}/my-container:latest
+          echo $GITHUB_PAT | docker login ghcr.io -u 3xjn --password-stdin
+          docker stop my-todo-app || true && docker rm my-todo-app || true
+          docker pull ghcr.io/${{ env.REPO_NAME }}/my-container:latest
+          docker run -d --name my-todo-app \
+            -p 8080:8080 \
+            ghcr.io/${{ env.REPO_NAME }}/my-container:latest
           EOF
