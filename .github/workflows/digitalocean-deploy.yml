@@ -39,4 +39,3 @@ jobs:
             echo $GITHUB_PAT | docker login ghcr.io -u 3xjn --password-stdin
             docker pull ghcr.io/${{ env.REPO_NAME }}/my-container:latest
             docker run -d --name my-todo-app ghcr.io/${{ env.REPO_NAME }}/my-container:latest
-
