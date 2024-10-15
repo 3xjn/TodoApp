@@ -1,6 +1,3 @@
-using System.Security.Cryptography.X509Certificates;
-using System.Text.RegularExpressions;
-using LettuceEncrypt;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -48,22 +45,6 @@ builder.Services.AddScoped<TodoService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-// Get the PFX file path from the environment variable
-var certPem = "/app/cert.pem";
-var keyPem = "/app/key.pem";
-
-// Load the PFX certificate
-var cert = X509Certificate2.CreateFromPemFile(certPem, keyPem);
-
-// Configure Kestrel to use the certificate
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(443, listenOptions => listenOptions.UseHttps(cert));
-});
-
-// Log certificate loading (for debugging)
-Console.WriteLine("SSL certificate loaded successfully.");
 
 var app = builder.Build();
 
