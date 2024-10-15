@@ -32,5 +32,9 @@ COPY --from=publish /app/publish .
 EXPOSE 80
 EXPOSE 443
 
+RUN whoami
+RUN env
+RUN pwd && ls -l
+
 # Set the entrypoint
 ENTRYPOINT ["dotnet", "TodoAppAPI.dll"]
