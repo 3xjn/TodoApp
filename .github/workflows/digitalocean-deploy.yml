@@ -42,8 +42,8 @@ jobs:
             echo $GITHUB_PAT | docker login ghcr.io -u 3xjn --password-stdin
             docker stop my-todo-app || true && docker rm my-todo-app || true
             docker pull ghcr.io/${{ env.REPO_NAME }}/my-container:latest
-            sudo docker run -d --name my-todo-app \
-              -v /etc/letsencrypt/live/3xjn.dev/:/app/ \
+            docker run -d --name my-todo-app \
+              -v /etc/letsencrypt/live/3xjn.dev/:/ \
               --user root \
               ghcr.io/${{ env.REPO_NAME }}/my-container:latest
           EOF
