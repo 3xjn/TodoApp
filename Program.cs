@@ -71,19 +71,6 @@ app.UseStaticFiles(new StaticFileOptions
 
 app.UseCors("AllowAll");
 
-app.Use(async (context, next) =>
-{
-    if (!context.Request.IsHttps && !context.Request.Path.StartsWithSegments("/.well-known/acme-challenge"))
-    {
-        var withHttps = $"https://{context.Request.Host}{context.Request.Path}{context.Request.QueryString}";
-        context.Response.Redirect(withHttps);
-    }
-    else
-    {
-        await next();
-    }
-});
-
 app.MapControllers();
 
 app.Run();
