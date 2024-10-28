@@ -32,7 +32,9 @@ namespace TodoAppAPI.Controllers
                 var payload = await GoogleJsonWebSignature.ValidateAsync(request.idToken);
                 var googleId = payload.Subject;
                 var email = payload.Email;
-                var token = GenerateJwtToken(googleId, email);
+                var fullName = $"{payload.GivenName} {payload.FamilyName}";
+
+                var token = GenerateJwtToken(googleId, email, fullName);
                 return Ok(new { token });
             }
             catch (Exception ex)
@@ -42,10 +44,8 @@ namespace TodoAppAPI.Controllers
             }
         }
 
-        private string GenerateJwtToken(string googleId, string email)
+        private string GenerateJwtToken(string googleId, string email, string fullName)
         {
-            Console.WriteLine($"google: {googleId})");
-
             var privateKey = _configuration["Jwt:PrivateKey"]?.Trim();
             if (string.IsNullOrEmpty(privateKey))
             {
@@ -63,7 +63,8 @@ namespace TodoAppAPI.Controllers
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, googleId),
-                new Claim(ClaimTypes.Email, email)
+                new Claim(ClaimTypes.Email, email),
+                new Claim(ClaimTypes.Name, fullName)
             };
 
             var token = new JwtSecurityToken(
@@ -81,13 +82,18 @@ namespace TodoAppAPI.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            var name = User.FindFirst(ClaimTypes.Name)?.Value;
+
+            Console.WriteLine($"User Id: {userId}");
+            Console.WriteLine($"Email: {email}");
+            Console.WriteLine($"Name: {name}");
 
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(email))
             {
                 return Unauthorized(new { message = "Invalid token" });
             }
 
-            return Ok(new { UserId = userId, Email = email });
+            return Ok(new { UserId = userId, Email = email, Name = name });
         }
 
     }

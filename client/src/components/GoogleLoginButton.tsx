@@ -29,6 +29,7 @@ const GoogleLoginButton = ({ onLoginSuccess }: { onLoginSuccess: () => void }) =
             onError={() => {
                 console.log("Login Failed");
             }}
+            useOneTap
         />
     );
 };
