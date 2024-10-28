@@ -41,6 +41,10 @@ jobs:
             MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
             MONGO_COLLECTION_NAME: ${{ secrets.MONGO_COLLECTION_NAME }}
             MONGO_DATABASE_NAME: ${{ secrets.MONGO_DATABASE_NAME }}
+            JWT_PRIVATE_KEY: ${{ secrets.JWT_PRIVATE_KEY }}
+            JWT_PUBLIC_KEY: ${{ secrets.JWT_PUBLIC_KEY }}
+            AUTH_GOOGLE_SECRET: ${{ secrets.AUTH_GOOGLE_SECRET }}
+            AUTH_GOOGLE_ID: ${{ secrets.AUTH_GOOGLE_ID }}
         run: |
           ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=10 -i ~/.ssh/id_rsa ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }} << EOF
           echo ${{ secrets.PAT }} | docker login ghcr.io -u 3xjn --password-stdin
@@ -51,5 +55,9 @@ jobs:
             -e Mongo__ConnectionString="$MONGO_CONNECTION_STRING" \
             -e Mongo__CollectionName="$MONGO_COLLECTION_NAME" \
             -e Mongo__DatabaseName="$MONGO_DATABASE_NAME" \
+            -e Jwt__PrivateKey="$JWT_PRIVATE_KEY" \
+            -e Jwt__PublicKey="$JWT_PUBLIC_KEY" \
+            -e Authentication__Google__ClientSecret="$AUTH_GOOGLE_SECRET" \
+            -e Authentication__Google__ClientId="$AUTH_GOOGLE_ID" \
             ghcr.io/${{ env.REPO_NAME }}/my-container:latest
           EOF
