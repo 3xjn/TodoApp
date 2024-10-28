@@ -6,9 +6,11 @@ import {
     Typography,
     IconButton,
     useMediaQuery,
+    Avatar,
+    Grid2,
 } from "@mui/material";
 import { FaMoon, FaSun } from "react-icons/fa";
-import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsIcon from "@mui/icons-material/Settings";
 import MenuIcon from "@mui/icons-material/Menu";
 import TodoEditor from "@components/TodoEditor";
 import { getTheme } from "@root/styles/theme";
@@ -45,7 +47,9 @@ const App = () => {
     const [drawerOpen, setDrawerOpen] = useState(false);
 
     const authToken = sessionStorage.getItem("authToken");
-    const [isAuthenticated, setIsAuthenticated] = useState(authToken != null || false);
+    const [isAuthenticated, setIsAuthenticated] = useState(
+        authToken != null || false
+    );
 
     const theme = useMemo(() => getTheme(mode), [mode]);
 
@@ -82,14 +86,20 @@ const App = () => {
                         onLoginSuccess={() => {
                             const fetchTodos = async () => {
                                 const data: ITodoData[] = await getData();
-                                dispatch({ type: actionTypes.SET_TODOS, payload: data });
+                                dispatch({
+                                    type: actionTypes.SET_TODOS,
+                                    payload: data,
+                                });
                                 if (data?.length > 0) {
-                                    dispatch({ type: actionTypes.SET_SELECTED_TODO, payload: data[0]?.id })
+                                    dispatch({
+                                        type: actionTypes.SET_SELECTED_TODO,
+                                        payload: data[0]?.id,
+                                    });
                                 }
                             };
-                            
+
                             fetchTodos();
-                            setIsAuthenticated(true)
+                            setIsAuthenticated(true);
                         }}
                     />
                 </Stack>
@@ -140,7 +150,7 @@ const App = () => {
                                     (item) => item.id === selectedTodoId
                                 )?.title || "Select a Todo"}
                             </Typography>
-                            <Stack>
+                            <Grid2 container spacing={2}>
                                 <IconButton
                                     onClick={toggleTheme}
                                     sx={{
@@ -152,12 +162,10 @@ const App = () => {
                                 >
                                     {mode === "light" ? <FaMoon /> : <FaSun />}
                                 </IconButton>
-                                {/* <Popover
-                                    open={true}
-                                >
-                                    <SettingsIcon></SettingsIcon>
-                                </Popover> */}
-                            </Stack>
+                                <IconButton>
+                                    <Avatar>AM</Avatar>
+                                </IconButton>
+                            </Grid2>
                         </Stack>
                         <Stack alignItems="center" sx={{ flexGrow: 1 }}>
                             {todos.length > 0 && (
