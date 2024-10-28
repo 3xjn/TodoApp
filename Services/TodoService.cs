@@ -17,6 +17,20 @@ namespace TodoAppAPI.Services
 
         public List<Todo> GetAll() => _todos.Find(todo => true).ToList();
 
+        public IEnumerable<TodoDto> GetAllForUser(string userId)
+        {
+            return _todos
+                .Find(todo => todo.UserId == userId)
+                .ToList()
+                .Select(todo => new TodoDto
+                {
+                    Id = todo.Id,
+                    Title = todo.Title,
+                    Content = todo.Content,
+                    Order = todo.Order
+                });
+        }
+
         public Todo Get(string id) => _todos.Find(todo => todo.Id == id).FirstOrDefault();
 
         public Todo Create(Todo todo)
