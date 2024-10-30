@@ -5,8 +5,6 @@ import {
     PaletteOptions,
 } from "@mui/material/styles";
 import { modernTechPalette } from "./themes/theme1";
-
-// Define a custom palette interface that extends PaletteOptions
 export interface CustomPalette extends PaletteOptions {
     primary: {
         main: string;
@@ -153,7 +151,7 @@ const getTheme = (mode: PaletteMode): Theme =>
                 styleOverrides: {
                     body: {
                         backgroundColor: getPalette(mode).background?.default,
-                        color: getPalette(mode).text?.primary,
+                        color: getPalette(mode).text?.secondary,
                     },
                     "::selection": {
                         backgroundColor:
@@ -167,12 +165,15 @@ const getTheme = (mode: PaletteMode): Theme =>
                         width: "100%",
                         maxWidth: "600px",
                         margin: "0 auto",
-                        boxShadow: `0 2px 4px ${getPalette(mode).custom.shadow}`,
+                        boxShadow: `0 2px 4px ${
+                            getPalette(mode).custom.shadow
+                        }`,
                         backgroundColor: getPalette(mode).background?.paper,
                         fontFamily:
                             '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif',
                         lineHeight: 1.6,
-                        transition: "border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
+                        transition:
+                            "border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
                         color: getPalette(mode).text?.primary,
                         "&:focus-within": {
                             borderColor: getPalette(mode).primary?.main,
@@ -185,7 +186,9 @@ const getTheme = (mode: PaletteMode): Theme =>
                     },
                     ".ProseMirror": {
                         outline: "none",
+                        color: getPalette(mode).text?.primary,
                         "& p": {
+                            color: getPalette(mode).text?.primary,
                             margin: "0 0 0.5em 0",
                             "&:last-child": {
                                 marginBottom: 0,
@@ -304,26 +307,51 @@ const getTheme = (mode: PaletteMode): Theme =>
                         color: getPalette(mode).text?.secondary,
                         border: `1px solid ${getPalette(mode).custom.border}`,
                         borderRadius: 6,
-            
+
                         "&.Mui-selected": {
-                            backgroundColor: getPalette(mode).custom.toggleButtonBackground,
+                            backgroundColor:
+                                getPalette(mode).custom.toggleButtonBackground,
                             color: getPalette(mode).primary?.main,
                             "&:hover": {
-                                backgroundColor: getPalette(mode).custom.toggleButtonBackgroundHover,
+                                backgroundColor:
+                                    getPalette(mode).custom
+                                        .toggleButtonBackgroundHover,
                             },
                         },
                     },
                 },
-            },            
+            },
             MuiIconButton: {
                 styleOverrides: {
                     root: {
-                        color: getPalette(mode).text?.secondary,
+                        color:
+                            mode === "light" ? "rgba(0, 0, 0, 0.54)" : "white",
                         "&.Mui-selected": {
                             backgroundColor:
                                 getPalette(mode).custom.toggleButtonBackground,
                             color: getPalette(mode).primary?.main,
                         },
+                    },
+                },
+            },
+            MuiStack: {
+                styleOverrides: {
+                    root: {
+                        backgroundColor: getPalette(mode).background?.default,
+                    },
+                },
+            },
+            MuiTypography: {
+                styleOverrides: {
+                    root: {
+                        color: getPalette(mode).text?.primary,
+                    },
+                },
+            },
+            MuiListItemIcon: {
+                styleOverrides: {
+                    root: {
+                        color: getPalette(mode).text?.primary,
                     },
                 },
             },

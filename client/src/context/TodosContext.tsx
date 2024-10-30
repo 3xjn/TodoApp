@@ -1,6 +1,7 @@
 import { createContext } from "react";
 import { ITodoData } from "@services/api";
 import { Action, useTodosReducer } from "./useTodosReducer";
+import useFetchTodos from "@root/hooks/useFetch";
 
 export const TodosContext = createContext<
     | {
@@ -16,6 +17,7 @@ export const TodosContext = createContext<
           onDeleteTodo: (id: string, save?: boolean) => void;
           onSetTodo: (todos: ITodoData[]) => void;
           dispatch: React.Dispatch<Action>;
+          fetchTodos: () => void;
       }
     | undefined
 >(undefined);
@@ -34,6 +36,8 @@ export const TodosProvider: React.FC<{ children: React.ReactNode }> = ({
         dispatch,
     } = useTodosReducer();
 
+    const fetchTodos = useFetchTodos(dispatch, selectedTodoId);
+
     return (
         <TodosContext.Provider
             value={{
@@ -45,6 +49,7 @@ export const TodosProvider: React.FC<{ children: React.ReactNode }> = ({
                 onDeleteTodo,
                 onSetTodo,
                 dispatch,
+                fetchTodos
             }}
         >
             {children}

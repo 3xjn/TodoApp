@@ -1,4 +1,4 @@
-import { DragDropContext } from "@hello-pangea/dnd";
+import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import { Stack, Drawer, Box } from "@mui/material";
 import { TodosContext } from "@context/TodosContext";
 import React, { useContext } from "react";
@@ -17,37 +17,34 @@ export const LeftNavbar: React.FC<LeftNavbarProps> = ({
     setDrawerOpen,
     isMobile,
 }) => {
-    const {
-        todos,
-        onSetTodo,
-    } = useContext(TodosContext)!;
+    const { todos, onSetTodo } = useContext(TodosContext)!;
+
+    const handleDragEnd = (result: DropResult<string>) => {
+        const { source, destination } = result;
+    
+        // Check if the item was dropped outside the list
+        if (!destination) return;
+    
+        // Check if the item was dropped in the same position
+        if (source.index === destination.index) return;
+    
+        // Update the todos array
+        const updatedTodos = Array.from(todos);
+        const [removedTodo] = updatedTodos.splice(source.index, 1);
+        updatedTodos.splice(destination.index, 0, removedTodo);
+    
+        // Update the order of the todos
+        const updates = updatedTodos.map((todo, index) => ({
+            ...todo,
+            order: index,
+        }));
+    
+        onSetTodo(updates);
+    };
 
     return (
         <DragDropContext
-            onDragEnd={(result) => {
-                const { source, destination } = result;
-
-                // check if was dragged
-                if (!destination || destination.index === source.index) {
-                    return;
-                }
-
-                const updatedTodos = Array.from(todos);
-
-                // remove dragged todo
-                const [movedTodo] = updatedTodos.splice(source.index, 1);
-
-                // add at new spot
-                updatedTodos.splice(destination.index, 0, movedTodo);
-
-                // set order of todos to their new indices
-                const updates = updatedTodos.map((todo, index) => ({
-                    order: index,
-                    ...todo,
-                }));
-
-                onSetTodo(updates);
-            }}
+            onDragEnd={handleDragEnd}
         >
             <Stack
                 width={drawerWidth}
@@ -61,7 +58,6 @@ export const LeftNavbar: React.FC<LeftNavbarProps> = ({
                 <Box
                     component="nav"
                     sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-                    aria-label="mailbox folders"
                 >
                     <Drawer
                         container={document.body}

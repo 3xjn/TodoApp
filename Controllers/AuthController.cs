@@ -44,6 +44,20 @@ namespace TodoAppAPI.Controllers
             }
         }
 
+        [HttpGet("profile-picture")]
+        [Authorize]
+        public ActionResult<string> GetProfilePicture()
+        {
+            // Retrieve the profile picture URL from the claims
+            var profilePictureUrl = HttpContext.User.FindFirst("picture")?.Value;
+            if (string.IsNullOrEmpty(profilePictureUrl))
+            {
+                return NotFound("Profile picture not found");
+            }
+
+            return Ok(profilePictureUrl);
+        }
+
         private string GenerateJwtToken(string googleId, string email, string fullName)
         {
             var privateKey = _configuration["Jwt:PrivateKey"]?.Trim();

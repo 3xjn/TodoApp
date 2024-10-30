@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
 import {
     ListItemText,
     TextField,
@@ -9,22 +9,18 @@ import {
 import { ITodoData } from "@services/api";
 import IconMenu from "@components/IconMenu";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { TodosContext } from "@root/context/TodosContext";
+import { actionTypes } from "@root/context/useTodosReducer";
 
 interface DrawerItemProps {
     todo: ITodoData;
-    isSelected: boolean;
-    onSelect: () => void;
-    onUpdate: (updates: Partial<ITodoData>) => void;
-    onDelete: () => void;
 }
 
 const DrawerItem: React.FC<DrawerItemProps> = ({
     todo,
-    isSelected,
-    onSelect,
-    onUpdate,
-    onDelete,
 }) => {
+    const { onUpdateTodo, onDeleteTodo, selectedTodoId, dispatch } = useContext(TodosContext)!;
+
     const [isEditing, setIsEditing] = useState(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -36,16 +32,18 @@ const DrawerItem: React.FC<DrawerItemProps> = ({
     };
 
     const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        onUpdate({ title: event.target.value });
+        onUpdateTodo(todo.id, { title: event.target.value }, false);
     };
 
     const handleTitleBlur = () => {
         setIsEditing(false);
+        onUpdateTodo(todo.id, { title: inputRef.current?.value, id: todo.id }, true);
     };
 
     const handleKeyPress = (event: React.KeyboardEvent) => {
         if (event.key === "Enter") {
             setIsEditing(false);
+            onUpdateTodo(todo.id, { title: inputRef.current?.value, id: todo.id }, true);
         }
     };
 
@@ -59,7 +57,12 @@ const DrawerItem: React.FC<DrawerItemProps> = ({
     };
 
     return (
-        <ListItemButton selected={isSelected} onClick={onSelect}>
+        <ListItemButton selected={selectedTodoId === todo.id} onClick={() => {
+            dispatch({
+                type: actionTypes.SET_SELECTED_TODO,
+                payload: todo.id,
+            })
+        }}>
             {isEditing ? (
                 <TextField
                     fullWidth
@@ -82,7 +85,9 @@ const DrawerItem: React.FC<DrawerItemProps> = ({
                 open={Boolean(anchorEl)}
                 onClose={handleMenuClose}
             >
-                <IconMenu onRename={handleRename} onDelete={onDelete} />
+                <IconMenu onRename={handleRename} onDelete={() => {
+                    onDeleteTodo(todo.id, true);
+                }} />
             </Menu>
         </ListItemButton>
     );

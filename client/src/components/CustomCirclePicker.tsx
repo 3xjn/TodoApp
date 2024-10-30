@@ -10,6 +10,7 @@ const StyledCirclePicker = styled(CirclePicker)(({ theme }) => ({
         width: "100% !important",
         gap: theme.spacing(0.5),
         justifyContent: "flex-start",
+        backgroundColor: "inherit"
     },
     "& > span > div": {
         margin: "0 !important",

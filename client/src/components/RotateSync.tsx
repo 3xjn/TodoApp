@@ -35,7 +35,7 @@ export const RotateSync: React.FC<RotateSyncProps> = ({
                 setPaused(true);
                 setTimeout(() => {
                     setPaused(false);
-                }, 50);
+                }, 20);
             }
         },
     });
