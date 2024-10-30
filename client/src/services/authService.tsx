@@ -9,7 +9,7 @@ export const validateToken = async (token: string): Promise<boolean> => {
         });
 
         if (response.ok) {
-            return true;
+            return response.json();
         }
 
         return false;

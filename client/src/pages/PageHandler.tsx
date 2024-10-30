@@ -1,28 +1,38 @@
 import { Box, CssBaseline, ThemeProvider } from "@mui/material";
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import App from "@pages/app/App";
 import { LoginPage } from "@pages/login/LoginPage";
 import { ThemeContext } from "@root/context/ThemeContext";
 import { AuthContext } from "@root/context/AuthContext";
+import { AlertStack } from "@root/components/AlertStack";
+import { TodosContext } from "@root/context/TodosContext";
 
 export const PageHandler: React.FC = () => {
-    const authContext = useContext(AuthContext);
-    const themeContext = useContext(ThemeContext);
+    const { isAuthenticated, hasChecked } = useContext(AuthContext)!;
+    const { fetchTodos } = useContext(TodosContext)!;
+    const { theme } = useContext(ThemeContext)!;
 
-    if (!authContext || !themeContext) return;
+    const [ fetchedTodos, setFetchedTodos ] = useState(false);
 
-    const { isAuthenticated } = authContext;
-    const { theme } = themeContext;
+    useEffect(() => {
+        if (!fetchedTodos && isAuthenticated && hasChecked) {
+            fetchTodos();
+            setFetchedTodos(true);
+        }
+    }, [fetchTodos, fetchedTodos, hasChecked, isAuthenticated, setFetchedTodos])
 
     return (
         <Box>
             <ThemeProvider theme={theme}>
                 <CssBaseline enableColorScheme></CssBaseline>
-                {isAuthenticated ? (
-                    <App />
-                ) : (
-                    <LoginPage />
-                )}
+                {
+                    isAuthenticated ?
+                        <App /> :
+                        hasChecked ?
+                            <LoginPage /> :
+                            <Box></Box>
+                }
+                <AlertStack></AlertStack>
             </ThemeProvider>
         </Box>
     );
