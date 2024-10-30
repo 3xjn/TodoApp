@@ -2,10 +2,9 @@ import GoogleLoginButton from "@root/components/GoogleLoginButton";
 import React, { useContext } from "react";
 import { Box } from "@mui/material";
 import { AuthContext } from "@root/context/AuthContext";
-import { getProfilePicture } from "@root/services/api";
 
 export const LoginPage: React.FC = () => {
-    const { setIsAuthenticated, setProfileUrl } = useContext(AuthContext)!;
+    const { setIsAuthenticated } = useContext(AuthContext)!;
 
     return (
         <Box 
@@ -17,8 +16,6 @@ export const LoginPage: React.FC = () => {
             <GoogleLoginButton
                 onLoginSuccess={async () => {
                     setIsAuthenticated(true);
-                    const profileUrl = await getProfilePicture();
-                    setProfileUrl(profileUrl);
                 }}
             />
         </Box>

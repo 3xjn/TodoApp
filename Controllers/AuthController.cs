@@ -32,9 +32,9 @@ namespace TodoAppAPI.Controllers
                 var payload = await GoogleJsonWebSignature.ValidateAsync(request.idToken);
                 var googleId = payload.Subject;
                 var email = payload.Email;
-                var fullName = $"{payload.GivenName} {payload.FamilyName}";
+                var givenName = payload.GivenName;
 
-                var token = GenerateJwtToken(googleId, email, fullName);
+                var token = GenerateJwtToken(googleId, email, givenName);
                 return Ok(new { token });
             }
             catch (Exception ex)
@@ -58,7 +58,7 @@ namespace TodoAppAPI.Controllers
             return Ok(profilePictureUrl);
         }
 
-        private string GenerateJwtToken(string googleId, string email, string fullName)
+        private string GenerateJwtToken(string googleId, string email, string givenName)
         {
             var privateKey = _configuration["Jwt:PrivateKey"]?.Trim();
             if (string.IsNullOrEmpty(privateKey))
@@ -78,7 +78,7 @@ namespace TodoAppAPI.Controllers
             {
                 new Claim(ClaimTypes.NameIdentifier, googleId),
                 new Claim(ClaimTypes.Email, email),
-                new Claim(ClaimTypes.Name, fullName)
+                new Claim(ClaimTypes.Name, givenName)
             };
 
             var token = new JwtSecurityToken(
@@ -96,7 +96,7 @@ namespace TodoAppAPI.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
-            var name = User.FindFirst(ClaimTypes.Name)?.Value;
+            var name = User.FindFirst(ClaimTypes.GivenName)?.Value;
 
             Console.WriteLine($"User Id: {userId}");
             Console.WriteLine($"Email: {email}");

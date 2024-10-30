@@ -1,5 +1,5 @@
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
-import { validateToken } from "@services/authService";
+import { validateToken } from "@root/services/authService";
 
 const GoogleLoginButton = ({ onLoginSuccess }: { onLoginSuccess: () => void }) => {
     const handleSuccess = async (credentialResponse: CredentialResponse) => {
@@ -8,7 +8,7 @@ const GoogleLoginButton = ({ onLoginSuccess }: { onLoginSuccess: () => void }) =
             
             const validated = await validateToken(credentialResponse.credential);
 
-            console.log("got token it is...", validated ? "bad" : "good")
+            console.log("got token it is...", validated ? "good" : "bad")
             
             // Optionally send it to the server for validation or further processing
             const response = await fetch("/auth/signin-google", {

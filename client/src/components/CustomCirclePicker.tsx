@@ -67,8 +67,6 @@ const CustomCirclePicker: React.FC<CustomCirclePickerProps> = ({
         "#7F8C8D",
     ];
 
-    console.log("color:", color);
-
     return (
         <Stack spacing={2}>
             <StyledCirclePicker

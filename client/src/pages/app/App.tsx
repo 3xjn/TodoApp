@@ -19,16 +19,14 @@ import { AuthContext } from "@context/AuthContext";
 const App: React.FC = () => {
     const [drawerOpen, setDrawerOpen] = useState(false);
 
-    const { todos, selectedTodoId, fetchTodos } = useContext(TodosContext)!;
+    const { todos, selectedTodoId } = useContext(TodosContext)!;
     const { mode, toggleTheme } = useContext(ThemeContext)!;
     const { profileUrl } = useContext(AuthContext)!;
 
     const theme = useMemo(() => getTheme(mode), [mode]);
     const isMobile = useMediaQuery(() => theme.breakpoints.down("sm"));
 
-    useEffect(() => {
-        fetchTodos();
-    }, []);
+    useEffect(() => console.log("Mounted Component {App}"), []);
 
     return (
         <Stack direction="row" height="100vh" maxHeight={"100%"}>
