@@ -8,7 +8,8 @@
             "@services/*" : ["services/*"],
             "@utils/*" : ["utils/*"],
             "@hooks/*" : ["hooks/*"],
-            "@context/*" : ["context/*"]
+            "@context/*" : ["context/*"],
+            "@pages/*" : ["pages/*"]
         },
         "target": "ES2020",
         "useDefineForClassFields": true,

@@ -32,8 +32,8 @@ namespace TodoAppAPI.Controllers
             return Ok(todo);
         }
 
-        [HttpDelete("{id:length(24)}")]
-        public async Task<ActionResult> Delete(string id)
+        [HttpDelete]
+        public async Task<ActionResult> Delete([FromQuery] string id)
         {
             var todo = _todoService.Get(id);
             if (todo == null)
@@ -49,7 +49,7 @@ namespace TodoAppAPI.Controllers
             }
 
             _todoService.Delete(id);
-            return Ok();
+            return NoContent();
         }
 
         [HttpPut("update")]

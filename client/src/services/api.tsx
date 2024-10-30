@@ -14,7 +14,7 @@ function getBearerToken(): string | null {
     return token;
 }
 
-async function fetchTodos(): Promise<ITodoData[]> {
+async function getData(): Promise<ITodoData[]> {
     const response = await fetch("/api/Todo", {
         method: "GET",
         headers: {
@@ -83,7 +83,7 @@ async function updateTodo(id: string, todo: Partial<ITodoData>): Promise<void> {
 
 // Delete a todo by ID
 async function deleteTodo(id: string): Promise<void> {
-    const response = await fetch(`/api/Todo/delete?id=${id}`, {
+    const response = await fetch(`/api/Todo?id=${id}`, {
         method: "DELETE",
         headers: {
             "Authorization": `Bearer ${getBearerToken()}`,
@@ -99,9 +99,28 @@ async function deleteTodo(id: string): Promise<void> {
     console.log("[delete] successfully deleted todo.");
 }
 
+async function getProfilePicture(): Promise<string> {
+    const response = await fetch(`/auth/profile-picture`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${getBearerToken()}`,
+            "Content-Type": "application/json",
+        },
+    });
+
+    if (!response.ok) {
+        console.error("[pfp] failed to get pfp");
+        throw new Error("Failed to GET profile picture: " + response.statusText);
+    }
+
+    console.log("[pfp] successfully got pfp.");
+    return response.text();
+}
+
 export {
-    fetchTodos as getData,
+    getData,
     updateTodo,
     deleteTodo,
     createTodo,
+    getProfilePicture
 };

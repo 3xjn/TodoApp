@@ -1,10 +1,24 @@
+import { styled } from '@mui/material/styles';
 import { Box, IconButton, Popover } from "@mui/material";
 import CustomCirclePicker from "@components/CustomCirclePicker";
-import { ColorResult } from "react-color"; // Note: Keep ColorResult since it represents the color selected in the picker
+import { ColorResult } from "react-color";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Editor } from "@tiptap/core";
 import FormatColorTextIcon from "@mui/icons-material/FormatColorText";
 import { getAllTextColors } from "@utils/getAllTextColors";
+
+const OutlinedIconButton = styled(IconButton)(({ theme }) => ({
+    color: theme.palette.text.secondary,
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: 6,
+    '&.Mui-selected': {
+        backgroundColor: theme.palette.action.selected,
+        color: theme.palette.primary.main,
+        '&:hover': {
+            backgroundColor: theme.palette.action.hover,
+        },
+    },
+}));
 
 interface ColorPickerToolbarProps {
     editor: Editor;
@@ -13,20 +27,14 @@ interface ColorPickerToolbarProps {
 export const ColorPickerToolbar: React.FC<ColorPickerToolbarProps> = ({
     editor,
 }) => {
-    const [colorPickerAnchor, setColorPickerAnchor] =
-        useState<null | HTMLElement>(null);
-    const [currentColor, setCurrentColor] = useState<string | undefined>(
-        undefined
-    );
+    const [colorPickerAnchor, setColorPickerAnchor] = useState<null | HTMLElement>(null);
+    const [currentColor, setCurrentColor] = useState<string | undefined>(undefined);
 
-    const handleColorChange = useCallback(
-        (color: ColorResult) => {
-            setCurrentColor(color.hex); // Assuming color.hex is a string
-            editor?.chain().focus().setColor(color.hex).run();
-            setColorPickerAnchor(null);
-        },
-        [editor]
-    );
+    const handleColorChange = useCallback((color: ColorResult) => {
+        setCurrentColor(color.hex);
+        editor?.chain().focus().setColor(color.hex).run();
+        setColorPickerAnchor(null);
+    }, [editor]);
 
     const handleColorPickerOpen = (event: React.MouseEvent<HTMLElement>) => {
         setColorPickerAnchor(event.currentTarget);
@@ -39,7 +47,7 @@ export const ColorPickerToolbar: React.FC<ColorPickerToolbarProps> = ({
     const state = editor.state;
 
     const color = useMemo(() => {
-        return getAllTextColors(state.selection, state.doc); // This returns string | undefined
+        return getAllTextColors(state.selection, state.doc);
     }, [state.selection, state.doc]);
 
     useEffect(() => {
@@ -54,13 +62,13 @@ export const ColorPickerToolbar: React.FC<ColorPickerToolbarProps> = ({
 
     return (
         <Box>
-            <IconButton onClick={handleColorPickerOpen} size="medium">
+            <OutlinedIconButton onClick={handleColorPickerOpen} size="medium">
                 <FormatColorTextIcon
                     sx={{
                         color: currentColor ? currentColor : "inherit",
                     }}
                 />
-            </IconButton>
+            </OutlinedIconButton>
             <Popover
                 open={colorPickerOpen}
                 anchorEl={colorPickerAnchor}

@@ -4,7 +4,7 @@ import CloudDoneIcon from "@mui/icons-material/CloudDone";
 import SyncIcon from "@mui/icons-material/Sync";
 import { RotateSync } from "@components/RotateSync"; // Reuse your existing rotating sync icon component
 import { useSpring, animated } from "react-spring"; // For animations
-import { useDebounce } from "@hooks/DebounceFunction"; // Reuse the existing debounce function
+import { useDebounce } from "@root/hooks/useDebounce"; // Reuse the existing debounce function
 
 interface SaveStatusIndicatorProps {
     saveAction: () => void; // Function that performs the save action
