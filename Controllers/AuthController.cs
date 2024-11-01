@@ -5,7 +5,6 @@ using Google.Apis.Auth;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace TodoAppAPI.Controllers
 {
@@ -33,8 +32,9 @@ namespace TodoAppAPI.Controllers
                 var googleId = payload.Subject;
                 var email = payload.Email;
                 var givenName = payload.GivenName;
+                var pfp = payload.Picture;
 
-                var token = GenerateJwtToken(googleId, email, givenName);
+                var token = GenerateJwtToken(googleId, email, givenName, pfp);
                 return Ok(new { token });
             }
             catch (Exception ex)
@@ -43,22 +43,7 @@ namespace TodoAppAPI.Controllers
                 return BadRequest(new { message = "Invalid Google token", error = ex.Message });
             }
         }
-
-        [HttpGet("profile-picture")]
-        [Authorize]
-        public ActionResult<string> GetProfilePicture()
-        {
-            // Retrieve the profile picture URL from the claims
-            var profilePictureUrl = HttpContext.User.FindFirst("picture")?.Value;
-            if (string.IsNullOrEmpty(profilePictureUrl))
-            {
-                return NotFound("Profile picture not found");
-            }
-
-            return Ok(profilePictureUrl);
-        }
-
-        private string GenerateJwtToken(string googleId, string email, string givenName)
+        private string GenerateJwtToken(string googleId, string email, string givenName, string pfp)
         {
             var privateKey = _configuration["Jwt:PrivateKey"]?.Trim();
             if (string.IsNullOrEmpty(privateKey))
@@ -76,9 +61,11 @@ namespace TodoAppAPI.Controllers
 
             var claims = new[]
             {
+                new Claim(JwtRegisteredClaimNames.Iss, "https://3xjn.dev"),
                 new Claim(ClaimTypes.NameIdentifier, googleId),
                 new Claim(ClaimTypes.Email, email),
-                new Claim(ClaimTypes.Name, givenName)
+                new Claim(ClaimTypes.Name, givenName),
+                new Claim("picture_url", pfp)
             };
 
             var token = new JwtSecurityToken(

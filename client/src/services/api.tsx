@@ -1,3 +1,7 @@
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
+
 export interface ITodoData {
     readonly id: string;
     title: string;
@@ -6,7 +10,7 @@ export interface ITodoData {
 }
 
 function getBearerToken(): string | null {
-    const token = sessionStorage.getItem('authToken');
+    const token = cookies.get("authToken");
     if (!token) {
         console.error("No auth token found");
         throw new Error("Failed to find an authorization token.");
@@ -32,17 +36,16 @@ async function getData(): Promise<ITodoData[]> {
     // Sort and map todos based on order
     return todos
         .sort((a, b) => {
-            const aOrder = a.order ?? Number.MAX_SAFE_INTEGER; // Fallback to max if undefined
+            const aOrder = a.order ?? Number.MAX_SAFE_INTEGER;
             const bOrder = b.order ?? Number.MAX_SAFE_INTEGER;
             return aOrder - bOrder;
         })
         .map((todo, index) => ({
             ...todo,
-            order: todo.order ?? index, // Assign index if order is undefined
+            order: todo.order ?? index,
         }));
 }
 
-// Create a new todo for the logged-in user
 async function createTodo(todo: Omit<Partial<ITodoData>, "id">): Promise<ITodoData | false> {
     const response = await fetch("/api/Todo", {
         method: "POST",
@@ -99,28 +102,9 @@ async function deleteTodo(id: string): Promise<void> {
     console.log("[delete] successfully deleted todo.");
 }
 
-async function getProfilePicture(): Promise<string> {
-    const response = await fetch(`/auth/profile-picture`, {
-        method: "GET",
-        headers: {
-            "Authorization": `Bearer ${getBearerToken()}`,
-            "Content-Type": "application/json",
-        },
-    });
-
-    if (!response.ok) {
-        console.error("[pfp] failed to get pfp");
-        throw new Error("Failed to GET profile picture: " + response.statusText);
-    }
-
-    console.log("[pfp] successfully got pfp.");
-    return response.text();
-}
-
 export {
     getData,
     updateTodo,
     deleteTodo,
-    createTodo,
-    getProfilePicture
+    createTodo
 };
