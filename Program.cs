@@ -109,7 +109,7 @@ builder.Services.AddSingleton(serviceProvider =>
         return new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = "https://accounts.google.com",
+            ValidIssuers = new [] { "https://accounts.google.com", "https://3xjn.dev" },
 
             ValidateAudience = false,
             ValidateIssuerSigningKey = true,

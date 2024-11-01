@@ -126,7 +126,7 @@ const getTheme = (mode: PaletteMode): Theme =>
             ...getPalette(mode),
         },
         typography: {
-            fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+            fontFamily: '"Helvetica", "Arial", sans-serif',
             h1: {
                 fontSize: "2rem",
                 fontWeight: 600,
@@ -354,7 +354,7 @@ const getTheme = (mode: PaletteMode): Theme =>
                         color: getPalette(mode).text?.primary,
                     },
                 },
-            },
+            }
         },
     });
 
@@ -362,4 +362,4 @@ const getTheme = (mode: PaletteMode): Theme =>
 const lightTheme = getTheme("light");
 const darkTheme = getTheme("dark");
 
-export { lightTheme, darkTheme, getTheme };
+export { lightTheme, darkTheme, getTheme, getPalette };

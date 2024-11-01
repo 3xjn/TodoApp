@@ -1,8 +1,7 @@
 import React, { useCallback, useContext, useRef, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { Stack, Divider, ToggleButtonGroup, Box, Grid2 } from "@mui/material";
-
-import { toolbarGroups } from "@root/toolbarButtons";
+import { toolbarGroups } from "@components/toolbarButtons";
 import { ToolbarButton } from "@components/ToolbarButton";
 import { ColorPickerToolbar } from "@components/ColorPickerToolbar";
 import SaveStatusIndicator from "@components/SaveStatusIndicator";
