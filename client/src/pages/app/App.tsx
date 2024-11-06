@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useContext, useEffect } from "react";
+import React, { useState, useMemo, useContext } from "react";
 import {
     Stack,
     Typography,
@@ -14,34 +14,15 @@ import { LeftNavbar } from "@components/LeftNavbar";
 import { TodosContext } from "@context/TodosContext";
 import { ThemeContext } from "@context/ThemeContext";
 import { AvatarMenu } from "@root/components/AvatarMenu";
-import { AuthContext } from "@root/context/AuthContext";
 
 const App: React.FC = () => {
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [fetchedTodos, setFetchedTodos] = useState(false);
 
-    const { fetchTodos } = useContext(TodosContext)!;
     const { todos, selectedTodoId } = useContext(TodosContext)!;
     const { mode, toggleTheme } = useContext(ThemeContext)!;
-    const { fetchAuthorizedUser, authorizedUser } = useContext(AuthContext)!;
 
     const theme = useMemo(() => getTheme(mode), [mode]);
     const isMobile = useMediaQuery(() => theme.breakpoints.down("sm"));
-
-    useEffect(() => console.log("Mounted Component {App}"), []);
-
-    useEffect(() => {
-        if (!fetchedTodos) {
-            fetchTodos();
-            setFetchedTodos(true);
-        }
-    }, [fetchTodos, fetchedTodos, setFetchedTodos]);
-
-    useEffect(() => {
-        if (!authorizedUser) {
-            fetchAuthorizedUser();
-        }
-    }, [authorizedUser, fetchAuthorizedUser]);
 
     return (
         <Stack direction="row" height="100vh" maxHeight={"100%"}>
@@ -103,4 +84,5 @@ const App: React.FC = () => {
         </Stack>
     );
 };
+
 export default App;

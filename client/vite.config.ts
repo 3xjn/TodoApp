@@ -4,6 +4,9 @@ import { resolve } from 'path';
 
 export default defineConfig({
     plugins: [react()],
+    preview: {
+        port: 4000
+    },
     resolve: {
         alias: {
             'react-native': 'react-native-web',

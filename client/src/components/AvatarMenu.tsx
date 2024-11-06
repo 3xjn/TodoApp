@@ -14,6 +14,7 @@ import { useTheme } from "@mui/material/styles";
 import { AuthContext } from "@root/context/AuthContext";
 import { ThemeContext } from "@root/context/ThemeContext";
 import { getPalette } from "@root/styles/theme";
+import { nameToColor } from "@root/utils/nameToColor";
 import React, { useContext, useState } from "react";
 
 const AvatarMenu: React.FC = () => {
@@ -31,8 +32,14 @@ const AvatarMenu: React.FC = () => {
         setOpen(!open);
     };
 
-    console.log("anchorEl:", anchorEl);
-    console.log("open:", open);
+    const getProfileLetters = (name: string) => {
+        const split = name.split(" ");
+        return split.length > 1
+            ? `${split[0][0].toUpperCase()}${split[1][0].toUpperCase()}`
+            : `${name[0].toUpperCase()}`;
+    };
+
+    const name = authorizedUser ? getProfileLetters(authorizedUser.name) : "";
 
     return (
         <ClickAwayListener
@@ -48,77 +55,102 @@ const AvatarMenu: React.FC = () => {
                     <Avatar
                         src={authorizedUser?.picture_url}
                         alt="User Avatar"
-                    ></Avatar>
+                        sx={{
+                            bgcolor: nameToColor(name),
+                            width: isMobile ? 32 : 40,
+                            height: isMobile ? 32 : 40,
+                            fontSize: isMobile ? "1rem" : "1.25rem",
+                            transition: "all 0.1s ease-in-out",
+                            "&:hover": {
+                                transform: "scale(1.05)",
+                            },
+                        }}
+                    >
+                        {name}
+                    </Avatar>
                 </IconButton>
                 <Popper
                     open={open}
                     anchorEl={anchorEl}
-                    // modifiers={[
-                    //     {
-                    //         name: "offset",
-                    //         options: {
-                    //             offset: [-20, 0],
-                    //         },
-                    //     },
-                    // ]}
+                    placement="bottom-end"
                     sx={{
-                        minWidth: "300px",
+                        zIndex: theme.zIndex.modal,
+                        mt: 1,
+                        filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.15))",
                     }}
                 >
                     <Stack
-                        flexDirection={"column"}
-                        justifyContent={"center"}
                         sx={{
                             backgroundColor: getPalette(mode).background?.paper,
+                            borderRadius: 2,
+                            border: `1px solid ${theme.palette.divider}`,
                             minWidth: {
-                                xs: "100px",
-                                sm: "150px",
+                                xs: "280px",
+                                sm: "320px",
                             },
-                            borderRadius: "16px",
+                            overflow: "hidden",
                         }}
-                        padding={1}
-                        spacing={1}
+                        padding={2}
                     >
-                        <Typography
-                            variant="body1"
-                            sx={{
-                                textAlign: "center",
-                                fontSize: "0.75em",
-                                padding: "10px"
-                            }}
-                        >
-                            {authorizedUser?.email}
-                        </Typography>
-                        <Box
-                            display="flex"
-                            justifyContent="center"
-                            width="100%"
-                        >
-                            <Avatar
-                                src={authorizedUser?.picture_url}
-                                alt="User Avatar"
+                        <Box sx={{ p: 3, textAlign: "center" }}>
+                            <Box
+                                display="flex"
+                                justifyContent="center"
+                                width="100%"
+                                mb={2}
+                            >
+                                <Avatar
+                                    src={authorizedUser?.picture_url}
+                                    alt="User Avatar"
+                                    sx={{
+                                        width: 96,
+                                        height: 96,
+                                        bgcolor: nameToColor(name),
+                                        fontSize: "2.5rem",
+                                        border: `2px solid ${theme.palette.background.paper}`,
+                                        boxShadow: theme.shadows[2],
+                                        transition:
+                                            "transform 0.2s ease-in-out",
+                                        "&:hover": {
+                                            transform: "scale(1.05)",
+                                        },
+                                    }}
+                                >
+                                    {name}
+                                </Avatar>
+                            </Box>
+                            <Typography
+                                variant="h6"
                                 sx={{
-                                    width: "80px",
-                                    height: "80px",
+                                    fontWeight: 500,
+                                    mb: 0.5,
                                 }}
-                            ></Avatar>
+                            >
+                                {authorizedUser?.name}
+                            </Typography>
+                            <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{
+                                    display: "block",
+                                    mb: 1,
+                                }}
+                            >
+                                {authorizedUser?.email}
+                            </Typography>
                         </Box>
-                        <Typography
-                            sx={{
-                                textAlign: "center",
-                            }}
-                        >
-                            Hi, {authorizedUser?.name}
-                        </Typography>
-                        <Divider></Divider>
-                        <Button
-                            onClick={handleLogout}
-                            sx={{
-                                borderRadius: "12px",
-                            }}
-                        >
-                            Logout
-                        </Button>
+
+                        <Divider />
+
+                        <Box sx={{ p: 2 }}>
+                            <Button
+                                onClick={handleLogout}
+                                variant="outlined"
+                                fullWidth
+                            >
+                                Sign Out
+                            </Button>
+                        </Box>
                     </Stack>
                 </Popper>
             </Box>

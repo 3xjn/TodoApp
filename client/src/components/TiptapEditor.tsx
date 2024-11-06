@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useRef, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
-import { Stack, Divider, ToggleButtonGroup, Box, Grid2 } from "@mui/material";
+import { Stack, Divider, ToggleButtonGroup, Box } from "@mui/material";
 import { toolbarGroups } from "@components/toolbarButtons";
 import { ToolbarButton } from "@components/ToolbarButton";
 import { ColorPickerToolbar } from "@components/ColorPickerToolbar";
@@ -70,32 +70,22 @@ const TiptapEditor: React.FC<TiptapEditorProps> = React.memo(
                     spacing={2}
                     sx={{ marginBottom: 1, width: "100%", flexWrap: "wrap" }}
                 >
-                    {toolbarGroups.map((toolbarButtons, groupIndex) => (
-                        <Grid2
-                            key={groupIndex}
-                            alignItems={"center"}
-                            justifyContent={"space-evenly"}
-                        >
-                            <ToggleButtonGroup size="small">
-                                {toolbarButtons.map((button) => (
-                                    <ToolbarButton
-                                        key={button.value}
-                                        {...button}
-                                        editor={editor}
-                                        icon={
-                                            React.isValidElement(button.icon)
-                                                ? button.icon
-                                                : null
-                                        }
-                                        onClick={handleToolbarButtonClick}
-                                    />
-                                ))}
-                            </ToggleButtonGroup>
-                            {/* Add a divider between each group except the last */}
-                            {groupIndex < toolbarGroups.length - 1 && (
-                                <Divider orientation="vertical" flexItem />
-                            )}
-                        </Grid2>
+                    {toolbarGroups.map((toolbarButtons) => (
+                        <ToggleButtonGroup size="small">
+                            {toolbarButtons.map((button) => (
+                                <ToolbarButton
+                                    key={button.value}
+                                    {...button}
+                                    editor={editor}
+                                    icon={
+                                        React.isValidElement(button.icon)
+                                            ? button.icon
+                                            : null
+                                    }
+                                    onClick={handleToolbarButtonClick}
+                                />
+                            ))}
+                        </ToggleButtonGroup>
                     ))}
                     <Divider
                         orientation="vertical"
@@ -103,7 +93,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = React.memo(
                         sx={{
                             mx: { xs: 16, sm: 0 },
                             mr: { xs: 16, sm: 0 },
-                            display: { xs: "block", sm: "none" },
+                            display: { xs: "none", sm: "none" },
                         }}
                     />
                     <ColorPickerToolbar editor={editor} />

@@ -1,10 +1,37 @@
 import { useReducer } from "react";
 import { ITodoData, createTodo, deleteTodo, updateTodo } from "@services/api";
 
-export interface Action {
-    type: string;
-    payload?: any;
-}
+type AddTodoAction = {
+    type: typeof actionTypes.ADD_TODO;
+    payload: ITodoData;
+};
+
+type UpdateTodoAction = {
+    type: typeof actionTypes.UPDATE_TODO;
+    payload: Partial<ITodoData> & { id: string };
+};
+
+type DeleteTodoAction = {
+    type: typeof actionTypes.DELETE_TODO;
+    payload: string;
+};
+
+type SetTodosAction = {
+    type: typeof actionTypes.SET_TODOS;
+    payload: ITodoData[];
+};
+
+type SetSelectedTodoAction = {
+    type: typeof actionTypes.SET_SELECTED_TODO;
+    payload: string | undefined;
+};
+
+export type Action =
+    | AddTodoAction
+    | UpdateTodoAction
+    | DeleteTodoAction
+    | SetTodosAction
+    | SetSelectedTodoAction;
 
 export const actionTypes = {
     ADD_TODO: "ADD_TODO",
@@ -12,7 +39,7 @@ export const actionTypes = {
     DELETE_TODO: "DELETE_TODO",
     SET_TODOS: "SET_TODOS",
     SET_SELECTED_TODO: "SET_SELECTED_TODO",
-};
+} as const;
 
 interface State {
     todos: ITodoData[];
@@ -38,7 +65,7 @@ const todoReducer = (state: State, action: Action): State => {
                 ...state,
                 todos: updatedTodos,
                 selectedTodoId:
-                    state.selectedTodoId == action.payload
+                    state.selectedTodoId === action.payload
                         ? updatedTodos.at(-1)?.id
                         : state.selectedTodoId
             };
@@ -48,11 +75,7 @@ const todoReducer = (state: State, action: Action): State => {
             return { ...state, todos: action.payload };
 
         case actionTypes.SET_SELECTED_TODO:
-            console.log("set todo to", action.payload)
-            return { ...state, selectedTodoId: action.payload }
-
-        default:
-            return state;
+            return { ...state, selectedTodoId: action.payload };
     }
 };
 

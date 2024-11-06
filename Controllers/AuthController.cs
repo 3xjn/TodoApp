@@ -43,6 +43,20 @@ namespace TodoAppAPI.Controllers
                 return BadRequest(new { message = "Invalid Google token", error = ex.Message });
             }
         }
+
+        [HttpGet("profile-picture")]
+        [Authorize]
+        public ActionResult<string> GetProfilePicture()
+        {
+            var profilePictureUrl = HttpContext.User.FindFirst("picture")?.Value;
+            if (string.IsNullOrEmpty(profilePictureUrl))
+            {
+                return NotFound("Profile picture not found");
+            }
+
+            return Ok(profilePictureUrl);
+        }
+
         private string GenerateJwtToken(string googleId, string email, string givenName, string pfp)
         {
             var privateKey = _configuration["Jwt:PrivateKey"]?.Trim();
@@ -55,7 +69,7 @@ namespace TodoAppAPI.Controllers
             rsaPrivate.ImportFromPem(privateKey);
 
             var signingCredentials = new SigningCredentials(
-                key: new RsaSecurityKey(rsaPrivate), // No KeyId
+                key: new RsaSecurityKey(rsaPrivate),
                 algorithm: SecurityAlgorithms.RsaSha256
             );
 

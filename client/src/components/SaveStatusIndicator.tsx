@@ -2,49 +2,45 @@ import React, { useState, useEffect } from "react";
 import { Stack, Typography } from "@mui/material";
 import CloudDoneIcon from "@mui/icons-material/CloudDone";
 import SyncIcon from "@mui/icons-material/Sync";
-import { RotateSync } from "@components/RotateSync"; // Reuse your existing rotating sync icon component
-import { useSpring, animated } from "react-spring"; // For animations
-import { useDebounce } from "@root/hooks/useDebounce"; // Reuse the existing debounce function
+import { RotateSync } from "@components/RotateSync";
+import { useSpring, animated } from "react-spring";
+import { useDebounce } from "@hooks/useDebounce";
 
 interface SaveStatusIndicatorProps {
-    saveAction: () => void; // Function that performs the save action
-    debounceTime?: number;  // Optional debounce time in ms (default: 3000)
-    contentChanged: boolean; // Tracks whether content has changed
+    saveAction: () => void;
+    debounceTime?: number;
+    contentChanged: boolean;
 }
 
 const SaveStatusIndicator: React.FC<SaveStatusIndicatorProps> = ({
     saveAction,
-    debounceTime = 3000,
+    debounceTime = 2500,
     contentChanged,
 }) => {
     const [saved, setSaved] = useState(true);
     const [visible, setVisible] = useState(false);
 
-    // Debounced save function
     const saveDebounce = useDebounce(() => {
         saveAction();
         setSaved(true);
         setVisible(true);
 
-        // Hide the "Saved" message after a few seconds
         setTimeout(() => {
             setVisible(false);
-        }, 3000);
+        }, 2000);
     }, debounceTime);
 
-    // Trigger the debounced save when content changes
     useEffect(() => {
         if (contentChanged) {
             setSaved(false);
             setVisible(true);
-            saveDebounce(); // Call the debounced save action when content changes
+            saveDebounce();
         }
     }, [contentChanged, saveDebounce]);
 
-    // React-Spring animation configuration
     const fade = useSpring({
         opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(-10px)", // Slide effect
+        transform: visible ? "translateY(0)" : "translateY(-10px)",
         config: { tension: 250, friction: 20 },
     });
 

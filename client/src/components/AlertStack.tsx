@@ -1,6 +1,6 @@
 import { Snackbar, Alert, Grid2 } from "@mui/material";
 import { useTransition, animated } from "react-spring";
-import { AlertContext } from "@context/AlertContext"; // Import your context hook
+import { AlertContext } from "@context/AlertContext";
 import { useContext } from "react";
 
 export const AlertStack = () => {

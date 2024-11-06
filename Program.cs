@@ -16,16 +16,21 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
-// Add CORS policy
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", builder =>
-    {
-        builder
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader();
-    });
+    options.AddPolicy("DevelopmentPolicy", policy =>
+        policy.WithOrigins("http://localhost:4000",
+                          "http://localhost:5163",
+                          "http://127.0.0.1:5163")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials());
+
+    options.AddPolicy("ProductionPolicy", policy =>
+        policy.WithOrigins("https://3xjn.dev")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials());
 });
 
 IConfiguration config = new ConfigurationBuilder()
@@ -87,7 +92,6 @@ var environment = builder.Environment;
 
 IdentityModelEventSource.ShowPII = true;
 
-// Add Singleton registration for RSA to be used across the app
 builder.Services.AddSingleton<RSA>(serviceProvider =>
 {
     var publicKey = config["Jwt:PublicKey"];
@@ -109,7 +113,7 @@ builder.Services.AddSingleton(serviceProvider =>
         return new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuers = new [] { "https://accounts.google.com", "https://3xjn.dev" },
+            ValidIssuers = new[] { "https://accounts.google.com", "https://3xjn.dev" },
 
             ValidateAudience = false,
             ValidateIssuerSigningKey = true,
@@ -118,7 +122,7 @@ builder.Services.AddSingleton(serviceProvider =>
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero,
 
-            RequireSignedTokens = false
+            RequireSignedTokens = true
         };
     });
 
@@ -128,7 +132,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.Authority = "https://accounts.google.com";
         options.Audience = config["Authentication:Google:ClientId"];
 
-        // Get TokenValidationParameters directly without another call to GetRequiredService
         options.TokenValidationParameters = builder.Services.BuildServiceProvider()
             .GetRequiredService<TokenValidationParameters>();
 
@@ -151,9 +154,13 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseCors("DevelopmentPolicy");
     app.UseSwagger();
     app.UseSwaggerUI();
     IdentityModelEventSource.ShowPII = true;
+} else
+{
+    app.UseCors("ProductionPolicy");
 }
 
 app.UseAuthentication();
@@ -170,8 +177,6 @@ app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = staticFileProvider
 });
-
-app.UseCors("AllowAll");
 
 app.MapControllers();
 

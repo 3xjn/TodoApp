@@ -9,14 +9,19 @@ import { Button, List, ListItem, Stack } from "@mui/material";
 import DrawerItem from "./DrawerItem";
 import { TodosContext } from "@context/TodosContext";
 
-export const TodoList: React.FC = () => {
+interface TodoListProps {
+    setDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+export const TodoList: React.FC<TodoListProps> = ({
+    setDrawerOpen
+}) => {
     const {
         todos,
         onAddTodo,
         onUpdateTodo,
     } = useContext(TodosContext)!;
 
-    // Memoize the sorted todos to avoid unnecessary re-renders
     const sortedTodos = useMemo(
         () => [...todos].sort((a, b) => (a.order || 0) - (b.order || 0)),
         [todos]
@@ -24,15 +29,12 @@ export const TodoList: React.FC = () => {
 
     const handleDragEnd = (result: DropResult<string>) => {
         const { source, destination } = result;
-    
-        // Early return if dropped outside or in the same position
+
         if (!destination || source.index === destination.index) return;
-    
-        // Reorder todos without creating a new array
+
         const [movedTodo] = todos.splice(source.index, 1);
         todos.splice(destination.index, 0, movedTodo);
-    
-        // Identify only the reordered items and update them
+
         const minIndex = Math.min(source.index, destination.index);
         const maxIndex = Math.max(source.index, destination.index);
         for (let i = minIndex; i <= maxIndex; i++) {
@@ -77,6 +79,7 @@ export const TodoList: React.FC = () => {
                                         >
                                             <DrawerItem
                                                 todo={todo}
+                                                setDrawerOpen={setDrawerOpen}
                                             />
                                         </ListItem>
                                     )}
