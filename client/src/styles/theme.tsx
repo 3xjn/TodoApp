@@ -4,7 +4,8 @@ import {
     PaletteMode,
     PaletteOptions,
 } from "@mui/material/styles";
-import { modernTechPalette } from "./themes/theme1";
+import { darkPalette } from "@styles/themes/dark";
+import { lightPalette } from "@styles/themes/light";
 
 export interface CustomPalette extends PaletteOptions {
     primary: {
@@ -25,52 +26,8 @@ export interface CustomPalette extends PaletteOptions {
     };
 }
 
-const lightPalette: CustomPalette = {
-    primary: {
-        main: "#2D3648", // Rich navy blue - more corporate and professional
-        light: "#4A5875",
-        dark: "#1A2133",
-    },
-    secondary: {
-        main: "#636E8C", // Muted blue-grey for secondary elements
-        light: "#8690A6",
-        dark: "#4A5266",
-    },
-    background: {
-        default: "#F8F9FB", // Slightly warmer than pure white
-        paper: "#FFFFFF",
-    },
-    text: {
-        primary: "#1C2025", // Softer than pure black
-        secondary: "#4B5563", // Balanced grey for better readability
-    },
-    error: {
-        main: "#DC3545", // Refined red
-    },
-    warning: {
-        main: "#F59E0B", // Warm amber
-    },
-    info: {
-        main: "#3B82F6", // Clear blue
-    },
-    success: {
-        main: "#10B981", // Professional green
-    },
-    custom: {
-        selectionBackground: "#E2E8F0",
-        selectionText: "#2D3648",
-        border: "#E5E7EB",
-        shadow: "rgba(17, 24, 39, 0.05)",
-        inputHoverBorder: "#CBD5E1",
-        placeholderText: "#94A3B8",
-        checkboxBorder: "#CBD5E1",
-        toggleButtonBackground: "#F1F5F9",
-        toggleButtonBackgroundHover: "#E2E8F0",
-    },
-};
-
 const getPalette = (mode: PaletteMode): CustomPalette => {
-    return mode === "light" ? lightPalette : modernTechPalette;
+    return mode === "light" ? lightPalette : darkPalette;
 };
 
 const getTheme = (mode: PaletteMode): Theme =>
@@ -291,6 +248,13 @@ const getTheme = (mode: PaletteMode): Theme =>
                 styleOverrides: {
                     img: {
                         pointerEvents: "none"
+                    }
+                }
+            },
+            MuiPaper: {
+                styleOverrides: {
+                    root: {
+                        backgroundImage: "none"
                     }
                 }
             }
