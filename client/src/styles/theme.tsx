@@ -5,6 +5,7 @@ import {
     PaletteOptions,
 } from "@mui/material/styles";
 import { modernTechPalette } from "./themes/theme1";
+
 export interface CustomPalette extends PaletteOptions {
     primary: {
         main: string;
@@ -24,134 +25,101 @@ export interface CustomPalette extends PaletteOptions {
     };
 }
 
-// Define light and dark palettes using the CustomPalette type
 const lightPalette: CustomPalette = {
     primary: {
-        main: "#4A90E2",
-        light: "#68A5E9",
-        dark: "#3A78C2",
+        main: "#2D3648", // Rich navy blue - more corporate and professional
+        light: "#4A5875",
+        dark: "#1A2133",
     },
     secondary: {
-        main: "#F5A623",
-        light: "#F7B946",
-        dark: "#D48C1F",
+        main: "#636E8C", // Muted blue-grey for secondary elements
+        light: "#8690A6",
+        dark: "#4A5266",
     },
     background: {
-        default: "#F4F5F7",
+        default: "#F8F9FB", // Slightly warmer than pure white
         paper: "#FFFFFF",
     },
     text: {
-        primary: "#333333",
-        secondary: "#666666",
+        primary: "#1C2025", // Softer than pure black
+        secondary: "#4B5563", // Balanced grey for better readability
     },
     error: {
-        main: "#F44336",
+        main: "#DC3545", // Refined red
     },
     warning: {
-        main: "#FF9800",
+        main: "#F59E0B", // Warm amber
     },
     info: {
-        main: "#2196F3",
+        main: "#3B82F6", // Clear blue
     },
     success: {
-        main: "#4CAF50",
+        main: "#10B981", // Professional green
     },
     custom: {
-        selectionBackground: "#68A5E9",
-        selectionText: "#FFFFFF",
-        border: "#E0E0E0",
-        shadow: "rgba(0, 0, 0, 0.05)",
-        inputHoverBorder: "#B3B3B3",
-        placeholderText: "#9CA3AF",
-        checkboxBorder: "#CBD5E0",
-        toggleButtonBackground: "#E8F1FC",
-        toggleButtonBackgroundHover: "#D1E4FA",
+        selectionBackground: "#E2E8F0",
+        selectionText: "#2D3648",
+        border: "#E5E7EB",
+        shadow: "rgba(17, 24, 39, 0.05)",
+        inputHoverBorder: "#CBD5E1",
+        placeholderText: "#94A3B8",
+        checkboxBorder: "#CBD5E1",
+        toggleButtonBackground: "#F1F5F9",
+        toggleButtonBackgroundHover: "#E2E8F0",
     },
 };
 
-// const darkPalette: CustomPalette = {
-//     primary: {
-//         main: "#FF5733",
-//         light: "#FF8D6B",
-//         dark: "#C70039",
-//     },
-//     secondary: {
-//         main: "#FFC300",
-//         light: "#FFD700",
-//         dark: "#B8860B",
-//     },
-//     background: {
-//         default: "#1A1A1A",
-//         paper: "#2C2C2C",
-//     },
-//     text: {
-//         primary: "#FFFFFF",
-//         secondary: "#FFC300",
-//     },
-//     error: {
-//         main: "#F44336",
-//     },
-//     warning: {
-//         main: "#FF9800",
-//     },
-//     info: {
-//         main: "#2196F3",
-//     },
-//     success: {
-//         main: "#4CAF50",
-//     },
-//     custom: {
-//         selectionBackground: "#4A90E2",
-//         selectionText: "#FFFFFF",
-//         border: "#4A5568",
-//         shadow: "rgba(0, 0, 0, 0.15)",
-//         inputHoverBorder: "#718096",
-//         placeholderText: "#718096",
-//         checkboxBorder: "#4A5568",
-//         toggleButtonBackground: "#2C5282",
-//         toggleButtonBackgroundHover: "#2B4C7E",
-//     },
-// };
-
-const darkPalette = modernTechPalette;
-
-// Function to get the correct palette based on the mode
 const getPalette = (mode: PaletteMode): CustomPalette => {
-    return mode === "light" ? lightPalette : darkPalette;
+    return mode === "light" ? lightPalette : modernTechPalette;
 };
 
 const getTheme = (mode: PaletteMode): Theme =>
     createTheme({
         palette: {
             ...getPalette(mode),
+            mode,
         },
         typography: {
-            fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+            fontFamily:
+                '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
             h1: {
-                fontSize: "2rem",
-                fontWeight: 600,
-                letterSpacing: "-0.01562em",
+                fontSize: "2.25rem",
+                fontWeight: 700,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.2,
             },
             h2: {
-                fontSize: "1.75rem",
+                fontSize: "1.875rem",
                 fontWeight: 600,
-                letterSpacing: "-0.00833em",
+                letterSpacing: "-0.01em",
+                lineHeight: 1.3,
+            },
+            h3: {
+                fontSize: "1.5rem",
+                fontWeight: 600,
+                letterSpacing: "-0.01em",
+                lineHeight: 1.375,
             },
             body1: {
                 fontSize: "1rem",
-                lineHeight: 1.5,
+                lineHeight: 1.6,
                 letterSpacing: "0.00938em",
+            },
+            button: {
+                fontWeight: 600,
+                letterSpacing: "0.01em",
             },
         },
         shape: {
-            borderRadius: 8,
+            borderRadius: 6,
         },
         components: {
             MuiCssBaseline: {
                 styleOverrides: {
                     body: {
                         backgroundColor: getPalette(mode).background?.default,
-                        color: getPalette(mode).text?.secondary,
+                        color: getPalette(mode).text?.primary,
+                        transition: "background-color 0.2s ease-in-out",
                     },
                     "::selection": {
                         backgroundColor:
@@ -160,21 +128,16 @@ const getTheme = (mode: PaletteMode): Theme =>
                     },
                     ".tiptap": {
                         border: `1px solid ${getPalette(mode).custom.border}`,
-                        borderRadius: "8px",
-                        padding: "12px",
+                        borderRadius: "6px",
+                        padding: "16px",
                         width: "100%",
-                        maxWidth: "600px",
+                        maxWidth: "700px",
                         margin: "0 auto",
                         boxShadow: `0 2px 4px ${
                             getPalette(mode).custom.shadow
                         }`,
                         backgroundColor: getPalette(mode).background?.paper,
-                        fontFamily:
-                            '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif',
-                        lineHeight: 1.6,
-                        transition:
-                            "border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
-                        color: getPalette(mode).text?.primary,
+                        transition: "all 0.2s ease-in-out",
                         "&:focus-within": {
                             borderColor: getPalette(mode).primary?.main,
                             boxShadow: `0 0 0 3px ${
@@ -257,17 +220,24 @@ const getTheme = (mode: PaletteMode): Theme =>
             MuiButton: {
                 styleOverrides: {
                     root: {
-                        borderRadius: 6,
                         textTransform: "none",
                         fontWeight: 600,
-                        padding: "6px 16px",
+                        padding: "8px 20px",
+                        transition: "all 0.2s ease-in-out",
                     },
                     contained: {
                         boxShadow: "none",
                         "&:hover": {
-                            boxShadow: `0px 2px 4px ${
+                            boxShadow: `0 4px 8px ${
                                 getPalette(mode).custom.shadow
                             }`,
+                            transform: "translateY(-1px)",
+                        },
+                    },
+                    outlined: {
+                        borderWidth: "1.5px",
+                        "&:hover": {
+                            borderWidth: "1.5px",
                         },
                     },
                 },
@@ -276,16 +246,12 @@ const getTheme = (mode: PaletteMode): Theme =>
                 styleOverrides: {
                     root: {
                         "& .MuiOutlinedInput-root": {
-                            borderRadius: 6,
-                            "& fieldset": {
-                                borderColor: getPalette(mode).custom.border,
-                            },
-                            "&:hover fieldset": {
-                                borderColor:
-                                    getPalette(mode).custom.inputHoverBorder,
-                            },
-                            "&.Mui-focused fieldset": {
-                                borderColor: getPalette(mode).primary?.main,
+                            transition: "all 0.2s ease-in-out",
+                            "&:hover": {
+                                backgroundColor:
+                                    mode === "light"
+                                        ? "rgba(0, 0, 0, 0.01)"
+                                        : "rgba(255, 255, 255, 0.01)",
                             },
                         },
                     },
@@ -294,29 +260,15 @@ const getTheme = (mode: PaletteMode): Theme =>
             MuiCard: {
                 styleOverrides: {
                     root: {
-                        boxShadow: `0px 2px 4px ${
+                        boxShadow: `0 4px 12px ${
                             getPalette(mode).custom.shadow
                         }`,
-                        borderRadius: 8,
-                    },
-                },
-            },
-            MuiToggleButton: {
-                styleOverrides: {
-                    root: {
-                        color: getPalette(mode).text?.secondary,
-                        border: `1px solid ${getPalette(mode).custom.border}`,
-                        borderRadius: 6,
-
-                        "&.Mui-selected": {
-                            backgroundColor:
-                                getPalette(mode).custom.toggleButtonBackground,
-                            color: getPalette(mode).primary?.main,
-                            "&:hover": {
-                                backgroundColor:
-                                    getPalette(mode).custom
-                                        .toggleButtonBackgroundHover,
-                            },
+                        transition: "all 0.2s ease-in-out",
+                        "&:hover": {
+                            transform: "translateY(-2px)",
+                            boxShadow: `0 6px 16px ${
+                                getPalette(mode).custom.shadow
+                            }`,
                         },
                     },
                 },
@@ -324,42 +276,28 @@ const getTheme = (mode: PaletteMode): Theme =>
             MuiIconButton: {
                 styleOverrides: {
                     root: {
-                        color:
-                            mode === "light" ? "rgba(0, 0, 0, 0.54)" : "white",
-                        "&.Mui-selected": {
+                        transition: "all 0.2s ease-in-out",
+                        "&:hover": {
                             backgroundColor:
-                                getPalette(mode).custom.toggleButtonBackground,
-                            color: getPalette(mode).primary?.main,
+                                mode === "light"
+                                    ? "rgba(0, 0, 0, 0.04)"
+                                    : "rgba(255, 255, 255, 0.04)",
+                            transform: "scale(1.05)",
                         },
                     },
                 },
             },
-            MuiStack: {
+            MuiAvatar: {
                 styleOverrides: {
-                    root: {
-                        backgroundColor: getPalette(mode).background?.default,
-                    },
-                },
-            },
-            MuiTypography: {
-                styleOverrides: {
-                    root: {
-                        color: getPalette(mode).text?.primary,
-                    },
-                },
-            },
-            MuiListItemIcon: {
-                styleOverrides: {
-                    root: {
-                        color: getPalette(mode).text?.primary,
-                    },
-                },
-            },
+                    img: {
+                        pointerEvents: "none"
+                    }
+                }
+            }
         },
     });
 
-// Create light and dark themes
 const lightTheme = getTheme("light");
 const darkTheme = getTheme("dark");
 
-export { lightTheme, darkTheme, getTheme };
+export { lightTheme, darkTheme, getTheme, getPalette };

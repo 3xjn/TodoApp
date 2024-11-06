@@ -14,10 +14,12 @@ import { actionTypes } from "@root/context/useTodosReducer";
 
 interface DrawerItemProps {
     todo: ITodoData;
+    setDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const DrawerItem: React.FC<DrawerItemProps> = ({
     todo,
+    setDrawerOpen
 }) => {
     const { onUpdateTodo, onDeleteTodo, selectedTodoId, dispatch } = useContext(TodosContext)!;
 
@@ -48,6 +50,7 @@ const DrawerItem: React.FC<DrawerItemProps> = ({
     };
 
     const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
         setAnchorEl(event.currentTarget);
     };
 
@@ -62,6 +65,7 @@ const DrawerItem: React.FC<DrawerItemProps> = ({
                 type: actionTypes.SET_SELECTED_TODO,
                 payload: todo.id,
             })
+            setDrawerOpen(false)
         }}>
             {isEditing ? (
                 <TextField

@@ -8,11 +8,11 @@ namespace TodoAppAPI.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [BindNever]
         public string? Id { get; set; } = null;
+
         public string? UserId { get; set; }
-        public string Title { get; set; }
-        public string Content { get; set; }
+        public string Title { get; set; } = null!;
+        public string Content { get; set; } = null!;
         public int? Order { get; set; }
     }
     public class TodoDto

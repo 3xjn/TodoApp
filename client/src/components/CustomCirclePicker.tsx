@@ -26,13 +26,13 @@ const StyledCirclePicker = styled(CirclePicker)(({ theme }) => ({
 interface CustomCirclePickerProps {
     color: Color | undefined;
     onChangeComplete: (color: ColorResult) => void;
-    onClear: () => void; // New prop for clearing color
+    onClear: () => void;
 }
 
 const CustomCirclePicker: React.FC<CustomCirclePickerProps> = ({
     color,
     onChangeComplete,
-    onClear, // Destructure new prop
+    onClear,
 }) => {
     const colors = [
         "#000000",
@@ -66,8 +66,6 @@ const CustomCirclePicker: React.FC<CustomCirclePickerProps> = ({
         "#95A5A6",
         "#7F8C8D",
     ];
-
-    console.log("color:", color);
 
     return (
         <Stack spacing={2}>

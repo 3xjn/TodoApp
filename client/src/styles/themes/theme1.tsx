@@ -1,4 +1,4 @@
-import { CustomPalette } from "../theme";
+import { CustomPalette } from "@styles/theme";
 
 export const modernTechPalette: CustomPalette = {
     primary: {
@@ -13,7 +13,7 @@ export const modernTechPalette: CustomPalette = {
     },
     background: {
         default: "#171717", // Almost Black
-        paper: "#1A1A1A",   // Dark Gray
+        paper: "#1c1c1c",   // Dark Gray
     },
     text: {
         primary: "#E0E0E0", // Light Gray

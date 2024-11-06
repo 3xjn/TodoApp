@@ -4,6 +4,8 @@ import App from "@pages/app/App";
 import { LoginPage } from "@pages/login/LoginPage";
 import { ThemeContext } from "@root/context/ThemeContext";
 import { AuthContext } from "@root/context/AuthContext";
+import { AlertStack } from "@root/components/AlertStack";
+import { TodosProvider } from "@root/context/TodosContext";
 
 export const PageHandler: React.FC = () => {
     const authContext = useContext(AuthContext);
@@ -19,10 +21,13 @@ export const PageHandler: React.FC = () => {
             <ThemeProvider theme={theme}>
                 <CssBaseline enableColorScheme></CssBaseline>
                 {isAuthenticated ? (
-                    <App />
+                    <TodosProvider isAuthenticated={isAuthenticated}>
+                        <App />
+                    </TodosProvider>
                 ) : (
                     <LoginPage />
                 )}
+                <AlertStack></AlertStack>
             </ThemeProvider>
         </Box>
     );

@@ -1,6 +1,6 @@
-import { createContext } from "react";
+import { createContext, useEffect } from "react";
 import { ITodoData } from "@services/api";
-import { Action, useTodosReducer } from "./useTodosReducer";
+import { Action, useTodosReducer } from "@context/useTodosReducer";
 import useFetchTodos from "@root/hooks/useFetch";
 
 export const TodosContext = createContext<
@@ -22,8 +22,12 @@ export const TodosContext = createContext<
     | undefined
 >(undefined);
 
-export const TodosProvider: React.FC<{ children: React.ReactNode }> = ({
+export const TodosProvider: React.FC<{ 
+    children: React.ReactNode, 
+    isAuthenticated: boolean 
+}> = ({
     children,
+    isAuthenticated
 }) => {
     const {
         todos,
@@ -36,7 +40,13 @@ export const TodosProvider: React.FC<{ children: React.ReactNode }> = ({
         dispatch,
     } = useTodosReducer();
 
-    const fetchTodos = useFetchTodos(dispatch, selectedTodoId);
+    const { fetchTodos, fetchState } = useFetchTodos(dispatch, selectedTodoId);
+
+    useEffect(() => {
+        if (isAuthenticated && fetchState === 'idle') {
+            fetchTodos();
+        }
+    }, [isAuthenticated, fetchState, fetchTodos]);
 
     return (
         <TodosContext.Provider

@@ -1,6 +1,6 @@
 import { Theme } from "@mui/material";
 import { getTheme } from "@root/styles/theme";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
 function getBrowserThemeColor() {
     if (
@@ -25,14 +25,21 @@ const ThemeContextProvider: React.FC<{ children: React.ReactNode }> = ({
     children
 }) => {
     const [mode, setMode] = useState<"light" | "dark">(getBrowserThemeColor());
-    const toggleTheme = () => {
+
+    const toggleTheme = useCallback(() => {
         setMode((prevMode: string) => (prevMode === "light" ? "dark" : "light"));
-    };
+    }, []);
 
     const theme = useMemo(() => getTheme(mode), [mode]);
 
+    const contextValue = useMemo(() => ({
+        mode,
+        toggleTheme,
+        theme
+    }), [mode, toggleTheme, theme]);
+
     return (
-        <ThemeContext.Provider value={{ mode, toggleTheme, theme }}>
+        <ThemeContext.Provider value={contextValue}>
             {children}
         </ThemeContext.Provider>
     )
