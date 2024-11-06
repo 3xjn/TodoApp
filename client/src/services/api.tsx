@@ -33,7 +33,6 @@ async function getData(): Promise<ITodoData[]> {
 
     const todos: ITodoData[] = await response.json();
 
-    // Sort and map todos based on order
     return todos
         .sort((a, b) => {
             const aOrder = a.order ?? Number.MAX_SAFE_INTEGER;
@@ -65,7 +64,6 @@ async function createTodo(todo: Omit<Partial<ITodoData>, "id">): Promise<ITodoDa
     return await response.json() as ITodoData;
 }
 
-// Update an existing todo
 async function updateTodo(id: string, todo: Partial<ITodoData>): Promise<void> {
     const response = await fetch(`/api/Todo/update`, {
         method: "PUT",
@@ -84,7 +82,6 @@ async function updateTodo(id: string, todo: Partial<ITodoData>): Promise<void> {
     console.log("[update]: success!");
 }
 
-// Delete a todo by ID
 async function deleteTodo(id: string): Promise<void> {
     const response = await fetch(`/api/Todo?id=${id}`, {
         method: "DELETE",
