@@ -25,9 +25,7 @@ const App: React.FC = () => {
     const isMobile = useMediaQuery(() => theme.breakpoints.down("sm"));
 
     return (
-        <Stack direction="row" height="100vh" maxHeight={"100%"} sx={{
-            backgroundImage: "none"
-        }}>
+        <Stack direction="row" height="100vh" maxHeight={"100%"}>
             <LeftNavbar
                 drawerOpen={drawerOpen}
                 setDrawerOpen={setDrawerOpen}
