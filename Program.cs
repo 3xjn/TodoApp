@@ -11,6 +11,9 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure thread pool
+ThreadPool.SetMinThreads(100, 100);
+
 // Add logging
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -27,7 +30,10 @@ builder.Services.AddCors(options =>
               .AllowCredentials());
 
     options.AddPolicy("ProductionPolicy", policy =>
-        policy.WithOrigins("https://3xjn.dev")
+        policy.WithOrigins("https://3xjn.dev",
+                          "https://www.3xjn.dev",
+                          "http://3xjn.dev",
+                          "http://www.3xjn.dev")
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials());

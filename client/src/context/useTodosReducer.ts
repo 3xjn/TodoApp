@@ -53,7 +53,7 @@ const todoReducer = (state: State, action: Action): State => {
 
         case actionTypes.UPDATE_TODO:
             return {
-                ...state,
+                selectedTodoId: state.selectedTodoId,
                 todos: state.todos.map(todo =>
                     todo.id === action.payload.id ? { ...todo, ...action.payload } : todo
                 ),
